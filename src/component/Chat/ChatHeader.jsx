@@ -8,14 +8,18 @@ import { IoIosNotifications } from "react-icons/io";
 import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
 import axios from 'axios';
+import SettingPopup from '../setting/pop.setting';
+import Modal from '../utility/zoomimage';
 function ChatHeader() {
-    const { chatUser } = useContext(ChatUserContext);
+    const { chatUser, setChatUser } = useContext(ChatUserContext);
     const socket = useSocket();
     const [hoveredIcon, setHoveredIcon] = useState(null);
     const [notificationCount, setNotificationCount] = useState(0);
     const [showPopup, setShowPopup] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
     const { user, setUser } = useContext(UserContext);
+    const [showSettingPopup, setShowSettingPopup] = useState(false);
+    const [showImageZoomModal, setImageZoomShowModal] = useState(false);
     const togglePopup = () => {
         setShowPopup(!showPopup);
     };
@@ -109,9 +113,14 @@ function ChatHeader() {
             <div className="flex items-center">
                 <img
                     src={chatUser?.profileimg || "https://plus.unsplash.com/premium_photo-1693007962731-c19c13af42c7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxN3x8fGVufDB8fHx8fA%3D%3D"}
+                    onClick={() => {
+                        setImageZoomShowModal(true);
+                    }}
                     alt="User"
-                    className="rounded-full w-12 h-12"
+                    className="rounded-full w-12 h-12 cursor-pointer"
                 />
+                {showImageZoomModal && (
+                    <Modal image={chatUser?.profileimg} alt={'user'} onClose={() => setImageZoomShowModal(false)} />)}
                 <div className="ml-3">
                     <span className="block font-semibold text-white">{chatUser?.username}</span>
                     <span className="block text-sm text-gray-400">Active Now</span>
@@ -190,10 +199,12 @@ function ChatHeader() {
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('settings')}
                     onMouseLeave={handleMouseLeave}
+                    onClick={() => chatUser ? setShowSettingPopup(true) : setShowSettingPopup(false)}
+
                 >
                     <IoMdSettings size={hoveredIcon === 'settings' ? 24 : 20} />
                 </button>
-
+                {showSettingPopup && (<SettingPopup currentUser={user} user={chatUser} onClose={() => setShowSettingPopup(false)} setChatUser={setChatUser} socket={socket} setUser={setUser} setImageZoomShowModal={setImageZoomShowModal} />)}
                 <button
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('call')}

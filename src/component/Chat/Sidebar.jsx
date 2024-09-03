@@ -21,7 +21,7 @@ function Sidebar() {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
                 setUsers(response.data);
-                setUsers(response.data.filter((use) => use._id !== user._id));
+
                 console.log("This is getAlluser", response.data);
             } catch (error) {
                 console.error("Error fetching users:", error);
@@ -29,6 +29,11 @@ function Sidebar() {
         };
         getUser();
     }, []);
+    useEffect(() => {
+        if (user) {
+            setUsers(users.filter((use) => use._id !== user?._id));
+        }
+    }, [user]);
     useEffect(() => {
         socket.on('FriendRemove', (data) => {
             console.log('FriendRemove:', data);
@@ -50,10 +55,10 @@ function Sidebar() {
     const filteredUsers = friends.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const handleChangeUser = (id, username, profileimg) => {
+    const handleChangeUser = (id, username, profileimg, email, description) => {
         console.log(id);
 
-        setChatUser({ id, username, profileimg });
+        setChatUser({ id, username, profileimg, email, description });
     }
     const togglePopup = () => {
         setShowPopup(!showPopup);
@@ -234,7 +239,7 @@ function Sidebar() {
                                     className="rounded-full w-10 h-10 mr-3"
                                 />
                                 <div className="flex-1">
-                                    <h4 className="font-semibold" onClick={() => handleChangeUser(user._id, user.username, user.profileimg)}>{user.username}</h4>
+                                    <h4 className="font-semibold" onClick={() => handleChangeUser(user._id, user.username, user.profileimg, user.email, user.description)}>{user.username}</h4>
                                     <p className="text-xs text-gray-400">Now</p>
                                 </div>
                             </div>

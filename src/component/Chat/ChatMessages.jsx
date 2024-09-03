@@ -92,7 +92,7 @@ function ChatMessages() {
                 {messages?.map((msg, index) => (
                     <div
                         key={index}
-                        className={`flex items-end mb-4 ${msg.fromUserId === user._id ? 'justify-end' : ''}`}
+                        className={`flex items-end mb-4 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
                     >
                         {msg?.fromUserId !== user?._id && (
                             <img

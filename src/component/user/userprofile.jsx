@@ -1,0 +1,156 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const UserComponent = ({ user }) => {
+    // console.log("UserComponent", user);
+    const [editMode, setEditMode] = useState(false);
+    const [profileImage, setProfileImage] = useState(user.profileimg);
+    const [userData, setUserData] = useState({
+        username: user.username,
+        email: user.email,
+        description: user.description,
+        profileImage: user.profileimg,
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUserData({
+            ...userData,
+            [name]: value,
+        });
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setUserData({
+            ...userData,
+            profileImage: file,
+        });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfileImage(reader.result);
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSave = async () => {
+        const formData = new FormData();
+        formData.append('img', userData.profileImage);
+        formData.append('username', userData.username);
+        formData.append('email', userData.email);
+        formData.append('description', userData.description);
+        try {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/updateUser`, formData, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('User updated successfully:', response.data);
+            setEditMode(false);
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-dark-blue-900 text-white">
+            <div className="w-full  p-8 bg-black  shadow-lg" style={{ 'height': '100vh' }}>
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-bold text-light-blue-500">User Profile</h1>
+                    {!editMode && (
+                        <button
+                            onClick={() => setEditMode(true)}
+                            className="bg-light-blue-500 hover:bg-light-blue-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Edit Profile
+                        </button>
+                    )}
+                </div>
+
+                <div className="flex space-x-12">
+                    <div className="flex-none">
+                        <div className="relative w-48 h-48">
+                            <img
+                                src={profileImage || 'https://via.placeholder.com/150'}
+                                alt={userData.username}
+                                className="rounded-full w-full h-full object-cover"
+                            />
+                            {editMode && (
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    name='img'
+                                />
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex-grow space-y-6">
+                        <div>
+                            <label className="block text-light-blue-500 font-semibold">Username</label>
+                            <input
+                                type="text"
+                                name="username"
+                                value={userData.username}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
+                                    }`}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-light-blue-500 font-semibold">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={userData.email}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
+                                    }`}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-light-blue-500 font-semibold">Description</label>
+                            <textarea
+                                name="description"
+                                value={userData.description}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
+                                    }`}
+                                rows="6"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {editMode && (
+                    <div className="mt-8 flex justify-end space-x-4">
+                        <button
+                            onClick={() => setEditMode(false)}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Save Changes
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default UserComponent;
