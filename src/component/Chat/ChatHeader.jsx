@@ -22,6 +22,7 @@ function ChatHeader() {
     const [showSettingPopup, setShowSettingPopup] = useState(false);
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
     const [showVoiceCall, setShowVoiceCall] = useState(false);
+    const [showVideoCall, setShowVideoCall] = useState(false);
     const togglePopup = () => {
         setShowPopup(!showPopup);
     };
@@ -215,14 +216,16 @@ function ChatHeader() {
                 >
                     <IoMdCall size={hoveredIcon === 'call' ? 24 : 20} />
                 </button>
-                {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} />)}
+                {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} value={'voice'} />)}
                 <button
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('video')}
                     onMouseLeave={handleMouseLeave}
+                    onClick={() => setShowVideoCall(true)}
                 >
                     <FaVideo size={hoveredIcon === 'video' ? 24 : 20} />
                 </button>
+                {showVideoCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVideoCall(false)} value={'video'} />)}
             </div>
         </div >
     );

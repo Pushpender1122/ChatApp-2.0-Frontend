@@ -4,22 +4,22 @@ import ChatWindow from './ChatWindow';
 import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
 import Peer from 'peerjs';
-
+import { FaMicrophone, FaVideoSlash, FaPhoneSlash } from 'react-icons/fa';
 function Test() {
     const socket = useSocket();
     const { user } = useContext(UserContext);
     const peerInstance = useRef(null);
     const [localStream, setLocalStream] = useState(null);
     const [remoteStream, setRemoteStream] = useState(null);
-    const [incomingCall, setIncomingCall] = useState(null); // Manage incoming call state
-    const [isCallPopupVisible, setCallPopupVisible] = useState(false); // Popup visibility state
-    const [isInCall, setIsInCall] = useState(false); // Manage in-call state
-    const [isMuted, setIsMuted] = useState(false); // Mute state
+    const [incomingCall, setIncomingCall] = useState(null);
+    const [isCallPopupVisible, setCallPopupVisible] = useState(false);
+    const [isInCall, setIsInCall] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
     const [calluserid, setCallUserId] = useState(null);
     const [peerjsid, setPeerjsId] = useState(null);
-
+    const [callType, setCallType] = useState(null);
+    const [isVideoHidden, setIsVideoHidden] = useState(false);
     useEffect(() => {
-        // Register the user and handle friend request
         if (user && socket) {
             socket.emit('register', { userId: user._id });
             socket.emit('friendRequest', { ReceiverId: user._id });
@@ -33,33 +33,31 @@ function Test() {
     }, [user, socket]);
 
     useEffect(() => {
-        // Handle incoming voice calls
         socket.on('voice_call', (data) => {
-            console.log('Incoming voice call:', data);
-            setIncomingCall(data); // Store the incoming call data
-            setCallPopupVisible(true); // Show the call popup
+            console.log('Incoming call:', data);
+            setIncomingCall(data);
+            setCallPopupVisible(true);
+            setCallType(data.callType); // Set the call type ('audio' or 'video')
 
             const peer = new Peer({});
             peerInstance.current = peer;
 
             peer.on('open', (id) => {
-                console.log('My peer ID is: ' + id);
                 const conn = peer.connect(data.peerId);
-
                 conn.on('open', () => {
                     conn.send('hi!');
                 });
-                conn.on('data', (data) => {
-                    console.log('Data received from peer:', data);
-                });
                 setCallUserId(data.senderId);
                 setPeerjsId(id);
-
             });
 
             const getUserMedia = async () => {
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                        video: true,
+                    });
+                    console.log('Local stream:', stream);
                     setLocalStream(stream);
                     return stream;
                 } catch (error) {
@@ -70,23 +68,19 @@ function Test() {
             const handleAnswerCall = async () => {
                 const stream = await getUserMedia();
                 peer.on('call', (call) => {
-                    call.answer(stream); // Answer the call with the local audio stream
-                    console.log('Call answered:', call);
-
+                    call.answer(stream);
                     call.on('stream', (remoteStream) => {
-                        console.log('Received remote stream:', remoteStream);
                         setRemoteStream(remoteStream);
                     });
                 });
             };
-            // handleAnswerCall();
         });
         return () => {
-            if (socket) {
-                socket.off('voice_call');
-            }
+            socket.off('voice_call');
         };
     }, [socket]);
+
+
     useEffect(() => {
         socket.on('end-call', () => {
             removeCallTrack();
@@ -95,9 +89,10 @@ function Test() {
             peerInstance.current?.destroy();
         });
     }, [localStream]);
+
     const getUserMedia = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === 'video' ? true : false });
             setLocalStream(stream);
             return stream;
         } catch (error) {
@@ -107,15 +102,11 @@ function Test() {
 
     const handleAcceptCall = async () => {
         const stream = await getUserMedia();
-        setCallPopupVisible(false); // Hide the incoming call popup
-        setIsInCall(true); // Show the in-call popup
+        setCallPopupVisible(false);
+        setIsInCall(true);
         peerInstance.current.on('call', (call) => {
-            console.log('testing call:', call);
-            call.answer(stream); // Answer the call with the local audio stream
-            console.log('Call answered:', call);
-
+            call.answer(stream);
             call.on('stream', (remoteStream) => {
-                console.log('Received remote stream:', remoteStream);
                 setRemoteStream(remoteStream);
             });
         });
@@ -143,13 +134,20 @@ function Test() {
             socket.emit('end-call', { toUserId: incomingCall.senderId });
         }
     };
+
     const removeCallTrack = () => {
-        console.log('removeCallTrack', localStream, remoteStream);
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             setLocalStream(null);
         }
-    }
+    };
+    const toggleVideoHide = () => {
+        if (localStream) {
+            const newIsVideoHidden = !isVideoHidden;
+            localStream.getVideoTracks().forEach(track => (track.enabled = !newIsVideoHidden));
+            setIsVideoHidden(newIsVideoHidden);
+        }
+    };
     return (
         <div className="flex h-screen bg-gray-900">
             <Sidebar />
@@ -161,7 +159,7 @@ function Test() {
                     <div className="bg-white p-6 rounded-lg shadow-lg text-center">
                         <h2 className="text-lg font-bold mb-4">Incoming Call</h2>
                         <img
-                            src={incomingCall?.senderProfileImg} // Display caller's image
+                            src={incomingCall?.senderProfileImg}
                             alt="Caller"
                             className="w-20 h-20 rounded-full mx-auto mb-2"
                         />
@@ -186,11 +184,11 @@ function Test() {
 
             {/* In-Call Popup */}
             {isInCall && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                <div className="fixed inset-0 flex items-center justify-center z-50" >
+                    {callType !== 'video' && (<div className="bg-white p-6 rounded-lg shadow-lg text-center">
                         <h2 className="text-lg font-bold mb-4">In Call with {incomingCall?.senderName}</h2>
                         <img
-                            src={incomingCall?.senderProfileImg} // Display caller's image
+                            src={incomingCall?.senderProfileImg}
                             alt="Caller"
                             className="w-20 h-20 rounded-full mx-auto mb-2"
                         />
@@ -208,15 +206,62 @@ function Test() {
                                 End Call
                             </button>
                         </div>
-                    </div>
-                    {localStream && (
+                    </div>)}
+
+                    {/* Conditionally Render Audio or Video */}
+                    {callType === 'video' ? (
+                        <>
+                            <div className="relative flex flex-col items-center">
+
+                                <video
+                                    ref={(video) => video && (video.srcObject = localStream)}
+                                    autoPlay
+                                    muted
+                                    className="w-full max-w-md "
+                                    style={{ transform: 'scaleX(-1)' }}
+                                />
+                                <div className="absolute bottom-0 mb-4 flex space-x-4">
+                                    <button
+                                        onClick={handleMute}
+                                        className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'} hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+                                    >
+                                        <FaMicrophone />
+                                    </button>
+
+                                    <button
+                                        onClick={handleEndCall}
+                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                    >
+                                        <FaPhoneSlash />
+                                    </button>
+
+                                    <button
+                                        onClick={toggleVideoHide}
+                                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                                    >
+                                        <FaVideoSlash />
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+
+                    ) : (
                         <audio
                             ref={(audio) => audio && (audio.srcObject = localStream)}
                             autoPlay
-                            muted // Mute local audio to avoid echo
+                            muted
+
                         ></audio>
                     )}
-                    {remoteStream && (
+
+                    {callType === 'video' ? (
+                        <video
+                            ref={(video) => video && (video.srcObject = remoteStream)}
+                            autoPlay
+                            className="w-full max-w-md"
+                            style={{ transform: 'scaleX(-1)' }}
+                        ></video>
+                    ) : (
                         <audio
                             ref={(audio) => audio && (audio.srcObject = remoteStream)}
                             autoPlay

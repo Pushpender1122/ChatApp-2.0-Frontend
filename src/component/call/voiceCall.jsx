@@ -1,29 +1,49 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '../context/socketContext';
 import Peer from 'peerjs';
+import { FaMicrophone, FaVideoSlash, FaPhoneSlash } from 'react-icons/fa';
 
-const VoiceCall = ({ user, chatUser, onClose }) => {
+const VoiceCall = ({ user, chatUser, onClose, value }) => {
     const socket = useSocket();
     const [localStream, setLocalStream] = useState(null);
     const [showCallPopup, setShowCallPopup] = useState(false);
-    const peerInstance = useRef(null);
-    const [isCalling, setIsCalling] = useState(false); // Track if a call is ongoing
+    const [isCalling, setIsCalling] = useState(false);
     const [remoteStream, setRemoteStream] = useState(null);
-    const [isMuted, setIsMuted] = useState(false); // To track mute status
+    const [isMuted, setIsMuted] = useState(false);
+    const [isVideoHidden, setIsVideoHidden] = useState(false);
+
+    const peerInstance = useRef(null);
 
     useEffect(() => {
-        const peer = new Peer({});
-        peerInstance.current = peer; // Store peer instance
+        const peer = new Peer();
+        peerInstance.current = peer;
 
         peer.on('open', (id) => {
-            console.log('My peer ID is: ' + id);
-            // Notify the server about the voice call request
-            socket.emit('voice_call', { toUserId: chatUser?.id, peerId: id, senderId: user?._id, senderName: user?.username, senderProfileImg: user?.profileimg });
+            socket.emit('voice_call', {
+                toUserId: chatUser?.id,
+                peerId: id,
+                senderId: user?._id,
+                senderName: user?.username,
+                senderProfileImg: user?.profileimg,
+                callType: value,
+            });
+        });
+
+        peer.on('call', (call) => {
+            if (localStream) {
+                call.answer(localStream);
+                call.on('stream', (stream) => {
+                    setRemoteStream(stream);
+                });
+            }
         });
 
         const getUserMedia = async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: value === 'video',
+                });
                 setLocalStream(stream);
                 return stream;
             } catch (error) {
@@ -31,120 +51,149 @@ const VoiceCall = ({ user, chatUser, onClose }) => {
             }
         };
 
-        const handleVoiceCall = async () => {
+        const handleCall = async () => {
             const stream = await getUserMedia();
             socket.on('user-connected', (data) => {
-                const call = peer.call(data.peerId, stream); // Make the call
-                setShowCallPopup(true); // Show the call popup UI
-                console.log('Initiating call with peer:', data.peerId);
+                const call = peer.call(data.peerId, stream);
                 call?.on('stream', (remoteStream) => {
-                    console.log('Received remote stream:', remoteStream);
                     setRemoteStream(remoteStream);
-                    setIsCalling(false); // Call is connected
+                    setIsCalling(false);
                 });
             });
         };
 
-        handleVoiceCall();
-        initiateCall();
+        handleCall();
+        setIsCalling(true);
+        setShowCallPopup(true);
 
         return () => {
-            peer?.disconnect();
-            peer?.destroy();
+            peerInstance.current?.destroy();
+            localStream?.getTracks().forEach(track => track.stop());
         };
-    }, [chatUser, socket, user]);
-
-    const initiateCall = () => {
-        setIsCalling(true); // User clicks the call button
-        setShowCallPopup(true); // Show popup
-    };
+    }, [chatUser, socket, user, value]);
 
     const toggleMute = () => {
         if (localStream) {
-            localStream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
-            setIsMuted(!isMuted);
+            const newIsMuted = !isMuted;
+            localStream.getAudioTracks().forEach(track => (track.enabled = !newIsMuted));
+            setIsMuted(newIsMuted);
         }
     };
-    const handlecalldisconnect = () => {
-        onClose(false)
+
+    const toggleVideoHide = () => {
+        if (localStream) {
+            const newIsVideoHidden = !isVideoHidden;
+            localStream.getVideoTracks().forEach(track => (track.enabled = !newIsVideoHidden));
+            setIsVideoHidden(newIsVideoHidden);
+        }
+    };
+
+    const handleCallDisconnect = () => {
+        onClose(false);
         setShowCallPopup(false);
-        peerInstance.current.disconnect();
-        peerInstance.current.destroy();
-        removeCallTrack();
+        peerInstance.current?.disconnect();
+        peerInstance.current?.destroy();
+        localStream?.getTracks().forEach(track => track.stop());
+        setLocalStream(null);
         socket.emit('end-call', { toUserId: chatUser?.id });
     };
-    const removeCallTrack = () => {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            setLocalStream(null);
-            onClose(false)
-        }
-    }
+
     useEffect(() => {
         socket.on('end-call', () => {
             setShowCallPopup(false);
             peerInstance.current?.disconnect();
             peerInstance.current?.destroy();
-            console.log('Call ended');
-            console.log(localStream);
-            removeCallTrack();
+            localStream?.getTracks().forEach(track => track.stop());
+            setLocalStream(null);
+            onClose(false);
         });
-    }, [localStream]);
+    }, [localStream, socket]);
+
     return (
         <div>
-            <h1>Voice Call</h1>
+            <h1>{value === 'video' ? 'Video Call' : 'Voice Call'}</h1>
 
-            {/* Popup for call in the center of the screen */}
             {showCallPopup && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center" style={{ 'background': 'rgb(31 41 55 / var(--tw-bg-opacity))' }}>
-                        <img
-                            src={chatUser?.profileimg || "https://via.placeholder.com/150"}
-                            alt="User Avatar"
-                            className="rounded-full w-24 h-24 mb-4"
-                        />
-                        <h2 className="text-lg font-bold mb-4">Calling {chatUser?.username}...</h2>
+                    {localStream && value === 'video' && (
+                        <div className="relative flex flex-col items-center">
+                            {isVideoHidden ? (
+                                <img
+                                    src={chatUser.profileimg} // Placeholder image URL
+                                    alt="Placeholder"
+                                    className="w-64 max-w-md"
+                                    style={{ transform: 'scaleX(-1)' }}
+                                />
+                            ) : (
+                                <video
+                                    ref={(video) => video && (video.srcObject = localStream)}
+                                    autoPlay
+                                    muted
+                                    className="w-full max-w-md"
+                                    style={{ transform: 'scaleX(-1)' }}
+                                />
+                            )}
+                            <div className="absolute bottom-0 mb-4 flex space-x-4">
+                                <button
+                                    onClick={toggleMute}
+                                    className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'} hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+                                >
+                                    <FaMicrophone />
+                                </button>
 
-                        {isCalling ? (
-                            <p>Connecting...</p>
-                        ) : (
-                            <p>Connected</p>
-                        )}
+                                <button
+                                    onClick={handleCallDisconnect}
+                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    <FaPhoneSlash />
+                                </button>
 
-                        {/* Mute and End Call Buttons */}
-                        <div className="flex space-x-4 mt-4">
-                            <button
-                                onClick={toggleMute}
-                                className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'
-                                    } hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
-                            >
-                                {isMuted ? 'Unmute' : 'Mute'}
-                            </button>
-
-                            <button
-                                onClick={handlecalldisconnect} // Hide popup and end call
-                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                End Call
-                            </button>
+                                <button
+                                    onClick={toggleVideoHide}
+                                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    <FaVideoSlash />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Local audio stream */}
-                    {localStream && (
-                        <audio
-                            ref={(audio) => audio && (audio.srcObject = localStream)}
-                            autoPlay
-                            muted // Mute local audio to avoid echo
-                        ></audio>
                     )}
 
-                    {/* Remote audio stream */}
-                    {remoteStream && (
-                        <audio
-                            ref={(audio) => audio && (audio.srcObject = remoteStream)}
+                    {remoteStream && value === 'video' && (
+                        <video
+                            ref={(video) => video && (video.srcObject = remoteStream)}
                             autoPlay
-                        ></audio>
+                            className="w-full max-w-md"
+                            style={{ transform: 'scaleX(-1)' }}
+                        />
+                    )}
+
+                    {value !== 'video' && (
+                        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center" style={{ 'background': 'rgb(31 41 55 / var(--tw-bg-opacity))' }}>
+                            <img
+                                src={chatUser?.profileimg || "https://via.placeholder.com/150"}
+                                alt="User Avatar"
+                                className="rounded-full w-24 h-24 mb-4"
+                            />
+                            <h2 className="text-lg font-bold mb-4">Calling {chatUser?.username}...</h2>
+
+                            {isCalling ? <p>Connecting...</p> : <p>Connected</p>}
+
+                            <div className="flex space-x-4 mt-4">
+                                <button
+                                    onClick={toggleMute}
+                                    className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'} hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+                                >
+                                    {isMuted ? 'Unmute' : 'Mute'}
+                                </button>
+
+                                <button
+                                    onClick={handleCallDisconnect}
+                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    End Call
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </div>
             )}
