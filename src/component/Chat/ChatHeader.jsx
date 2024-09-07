@@ -10,6 +10,7 @@ import { UserContext } from '../context/user';
 import axios from 'axios';
 import SettingPopup from '../setting/pop.setting';
 import Modal from '../utility/zoomimage';
+import VoiceCall from '../call/voiceCall';
 function ChatHeader() {
     const { chatUser, setChatUser } = useContext(ChatUserContext);
     const socket = useSocket();
@@ -20,6 +21,7 @@ function ChatHeader() {
     const { user, setUser } = useContext(UserContext);
     const [showSettingPopup, setShowSettingPopup] = useState(false);
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
+    const [showVoiceCall, setShowVoiceCall] = useState(false);
     const togglePopup = () => {
         setShowPopup(!showPopup);
     };
@@ -209,10 +211,11 @@ function ChatHeader() {
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('call')}
                     onMouseLeave={handleMouseLeave}
+                    onClick={() => setShowVoiceCall(true)}
                 >
                     <IoMdCall size={hoveredIcon === 'call' ? 24 : 20} />
                 </button>
-
+                {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} />)}
                 <button
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('video')}

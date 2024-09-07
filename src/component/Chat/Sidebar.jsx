@@ -15,6 +15,7 @@ function Sidebar() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [friends, setFriends] = useState([])
     const socket = useSocket();
+
     useEffect(() => {
         // Fetch users when the component mounts
         const getUser = async () => {
