@@ -20,7 +20,6 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
             if (response.data.message === 'Friend removed successfully') {
                 console.log('Friend removed:', response.data.message);
                 // if (selectedUser) {
-
                 socket.emit('friendRemove', { senderId: currentUser._id, ReceiverId: user.id });
                 setUser(null)
                 onClose();
@@ -29,6 +28,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                 if (user.id) {
                     setChatUser(null);
                 }
+                window.location.reload();
             }
         } catch (error) {
             console.error('Error removing friend:', error);

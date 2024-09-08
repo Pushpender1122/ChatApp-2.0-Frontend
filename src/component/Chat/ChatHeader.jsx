@@ -226,6 +226,7 @@ function ChatHeader() {
                     <FaVideo size={hoveredIcon === 'video' ? 24 : 20} />
                 </button>
                 {showVideoCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVideoCall(false)} value={'video'} />)}
+
             </div>
         </div >
     );

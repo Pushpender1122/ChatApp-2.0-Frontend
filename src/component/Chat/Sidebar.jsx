@@ -7,6 +7,8 @@ import { ChatUserContext } from '../context/chatUser';
 import { useSocket } from '../context/socketContext';
 import { IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function Sidebar() {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +19,14 @@ function Sidebar() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [friends, setFriends] = useState([])
     const socket = useSocket();
+    const [alertmsg, setAlertmsg] = useState({
+        message: '',
+        type: 'success',
+    });
+    const notify = () => toast[alertmsg.type](alertmsg.message, {
+        autoClose: 2000,
+    });
+
 
     useEffect(() => {
         // Fetch users when the component mounts
@@ -83,15 +93,28 @@ function Sidebar() {
             });
             if (response.data.message === 'Friend added successfully') {
                 // console.log('Friend added ram ram', user._id);   
+                setAlertmsg({
+                    message: response.data.message,
+                    type: 'success',
+                });
                 socket.emit('friendRequest', { ReceiverId: selectedUser._id });
             }
             console.log('Friend added:', response.data.message);
         } catch (error) {
+            setAlertmsg({
+                message: error.response.data.message,
+                type: 'error',
+            });
             console.error('Error adding friend:', error);
         }
 
+        // setShowPopup(!showPopup);
     };
-
+    useEffect(() => {
+        if (alertmsg.message !== '') {
+            notify();
+        }
+    }, [alertmsg]);
     const handleRemoveFriend = async () => {
         // alert(`${selectedUser.username} has been removed as a friend!`);
         try {
@@ -104,6 +127,10 @@ function Sidebar() {
             });
             if (response.data.message === 'Friend removed successfully') {
                 console.log('Friend removed:', response.data.message);
+                setAlertmsg({
+                    message: response.data.message,
+                    type: 'success',
+                });
                 if (selectedUser) {
                     setFriends(prevFriends => prevFriends.filter(f => f._id !== selectedUser._id));
                     socket.emit('friendRemove', { senderId: user._id, ReceiverId: selectedUser._id });
@@ -115,6 +142,10 @@ function Sidebar() {
                 }
             }
         } catch (error) {
+            setAlertmsg({
+                message: error.response.data.message,
+                type: 'error',
+            });
             console.error('Error removing friend:', error);
         }
     };
@@ -247,11 +278,15 @@ function Sidebar() {
                                     <h4 className="font-semibold" onClick={() => handleChangeUser(user._id, user.username, user.profileimg, user.email, user.description)}>{user.username}</h4>
                                     <p className="text-xs text-gray-400">Now</p>
                                 </div>
+                                {/* <div className=" bg-red-500  text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                    *
+                                </div> */}
                             </div>
                         ))
                     ) : (
                         <p className="text-sm text-gray-400">No users found</p>
                     )}
+                    <ToastContainer />
                 </div>
             </div>
         </div>

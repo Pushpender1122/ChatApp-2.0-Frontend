@@ -13,9 +13,39 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
     const [isVideoHidden, setIsVideoHidden] = useState(false);
 
     const peerInstance = useRef(null);
-
+    const username = process.env.REACT_APP_METERED_USERNAME;
+    const credential = process.env.REACT_APP_METERED_PASSWORD;
     useEffect(() => {
-        const peer = new Peer();
+        const peer = new Peer({
+            config: {
+                'iceServers': [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    {
+                        urls: "stun:stun.relay.metered.ca:80",
+                    },
+                    {
+                        urls: "turn:global.relay.metered.ca:80",
+                        username,
+                        credential,
+                    },
+                    {
+                        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                        username,
+                        credential,
+                    },
+                    {
+                        urls: "turn:global.relay.metered.ca:443",
+                        username,
+                        credential,
+                    },
+                    {
+                        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                        username,
+                        credential,
+                    },
+                ]
+            }
+        });
         peerInstance.current = peer;
 
         peer.on('open', (id) => {

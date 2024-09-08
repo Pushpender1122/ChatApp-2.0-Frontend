@@ -5,6 +5,7 @@ import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
 import Peer from 'peerjs';
 import { FaMicrophone, FaVideoSlash, FaPhoneSlash } from 'react-icons/fa';
+import UserFetch from '../userFetch';
 function Test() {
     const socket = useSocket();
     const { user } = useContext(UserContext);
@@ -19,6 +20,8 @@ function Test() {
     const [peerjsid, setPeerjsId] = useState(null);
     const [callType, setCallType] = useState(null);
     const [isVideoHidden, setIsVideoHidden] = useState(false);
+    const username = process.env.REACT_APP_METERED_USERNAME;
+    const credential = process.env.REACT_APP_METERED_PASSWORD;
     useEffect(() => {
         if (user && socket) {
             socket.emit('register', { userId: user._id });
@@ -39,7 +42,36 @@ function Test() {
             setCallPopupVisible(true);
             setCallType(data.callType); // Set the call type ('audio' or 'video')
 
-            const peer = new Peer({});
+            const peer = new Peer({
+                config: {
+                    'iceServers': [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        {
+                            urls: "stun:stun.relay.metered.ca:80",
+                        },
+                        {
+                            urls: "turn:global.relay.metered.ca:80",
+                            username,
+                            credential,
+                        },
+                        {
+                            urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                            username,
+                            credential,
+                        },
+                        {
+                            urls: "turn:global.relay.metered.ca:443",
+                            username,
+                            credential,
+                        },
+                        {
+                            urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                            username,
+                            credential,
+                        },
+                    ]
+                }
+            });
             peerInstance.current = peer;
 
             peer.on('open', (id) => {
@@ -153,7 +185,7 @@ function Test() {
         <div className="flex h-screen bg-gray-900">
             <Sidebar />
             <ChatWindow />
-
+            <UserFetch />
             {/* Incoming Call Popup */}
             {isCallPopupVisible && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
