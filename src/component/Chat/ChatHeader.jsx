@@ -212,7 +212,7 @@ function ChatHeader() {
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('call')}
                     onMouseLeave={handleMouseLeave}
-                    onClick={() => setShowVoiceCall(true)}
+                    onClick={() => chatUser ? setShowVoiceCall(true) : setShowVoiceCall(false)}
                 >
                     <IoMdCall size={hoveredIcon === 'call' ? 24 : 20} />
                 </button>
@@ -221,7 +221,7 @@ function ChatHeader() {
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('video')}
                     onMouseLeave={handleMouseLeave}
-                    onClick={() => setShowVideoCall(true)}
+                    onClick={() => chatUser ? setShowVideoCall(true) : setShowVideoCall(false)}
                 >
                     <FaVideo size={hoveredIcon === 'video' ? 24 : 20} />
                 </button>

@@ -1,17 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const UserComponent = ({ user }) => {
     // console.log("UserComponent", user);
     const [editMode, setEditMode] = useState(false);
-    const [profileImage, setProfileImage] = useState(user.profileimg);
-    const [userData, setUserData] = useState({
-        username: user.username,
-        email: user.email,
-        description: user.description,
-        profileImage: user.profileimg,
+    const [profileImage, setProfileImage] = useState(user?.profileimg);
+    const navigate = useNavigate();
+    const notify = () => toast.info("Logout Successful!", {
+        autoClose: 2000,
     });
-
+    const [userData, setUserData] = useState({
+        username: user?.username,
+        email: user?.email,
+        description: user?.description,
+        profileImage: user?.profileimg,
+    });
+    useEffect(() => {
+        setUserData({
+            username: user?.username,
+            email: user?.email,
+            description: user?.description,
+            profileImage: user?.profileimg,
+        });
+        setProfileImage(user?.profileimg);
+    }, [user]);
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUserData({
@@ -54,7 +68,24 @@ const UserComponent = ({ user }) => {
             console.error('Error updating user:', error);
         }
     };
-
+    const handlelogout = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/logout`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            console.log('User logged out successfully:', response.data);
+            localStorage.removeItem('token');
+            notify()
+            setTimeout(() => {
+                navigate(`${process.env.REACT_APP_BASE_URL}/login`);
+            }, 3000);
+        }
+        catch (error) {
+            console.error('Error logging out user:', error);
+        }
+    }
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-dark-blue-900 text-white">
             <div className="w-full  p-8 bg-black  shadow-lg" style={{ 'height': '100vh' }}>
@@ -68,14 +99,28 @@ const UserComponent = ({ user }) => {
                             Edit Profile
                         </button>
                     )}
-                </div>
+                    <div>
+                        <button
+                            onClick={() => navigate(`/`)}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-2"
+                        >
+                            Chat
+                        </button>
+                        <button
+                            onClick={handlelogout}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Logout
+                        </button>
 
+                    </div>
+                </div>
                 <div className="flex space-x-12">
                     <div className="flex-none">
                         <div className="relative w-48 h-48">
                             <img
                                 src={profileImage || 'https://via.placeholder.com/150'}
-                                alt={userData.username}
+                                alt={userData?.username}
                                 className="rounded-full w-full h-full object-cover"
                             />
                             {editMode && (
@@ -96,7 +141,7 @@ const UserComponent = ({ user }) => {
                             <input
                                 type="text"
                                 name="username"
-                                value={userData.username}
+                                value={userData?.username}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
                                 className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
@@ -109,7 +154,7 @@ const UserComponent = ({ user }) => {
                             <input
                                 type="email"
                                 name="email"
-                                value={userData.email}
+                                value={userData?.email}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
                                 className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
@@ -121,7 +166,7 @@ const UserComponent = ({ user }) => {
                             <label className="block text-light-blue-500 font-semibold">Description</label>
                             <textarea
                                 name="description"
-                                value={userData.description}
+                                value={userData?.description}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
                                 className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
@@ -149,6 +194,7 @@ const UserComponent = ({ user }) => {
                     </div>
                 )}
             </div>
+            <ToastContainer />
         </div>
     );
 };

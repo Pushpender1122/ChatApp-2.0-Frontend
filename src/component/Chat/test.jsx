@@ -115,6 +115,7 @@ function Test() {
 
     const handleDeclineCall = () => {
         setCallPopupVisible(false);
+        socket.emit('end-call', { toUserId: incomingCall.senderId });
     };
 
     const handleMute = () => {

@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 const Signup = () => {
     const [username, setUsername] = useState('');
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const notify = () => toast.success("Registered Successful!", {
+        autoClose: 2000,
+    });
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(''); // Reset error state before submission
@@ -32,9 +37,13 @@ const Signup = () => {
             console.log(response.data);
             // Clear form fields after successful submission
             alert("User Registered Successfully");
+            notify()
             setUsername('');
             setEmail('');
             setPassword('');
+            setTimeout(() => {
+                navigate(`${process.env.REACT_APP_BASE_URL}/login`);
+            }, 3000);
         } catch (err) {
             console.error('Error during signup:', err);
             if (err.response && err.response.data) {
@@ -94,9 +103,16 @@ const Signup = () => {
                         >
                             {loading ? 'Signing up...' : 'Sign Up'}
                         </button>
+                        <button
+                            onClick={() => navigate(`${process.env.REACT_APP_BASE_URL}/login`)}
+                            className="mt-4 w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                        >
+                            Log In
+                        </button>
                     </div>
                 </form>
             </div>
+            <ToastContainer />
         </div>
     );
 };

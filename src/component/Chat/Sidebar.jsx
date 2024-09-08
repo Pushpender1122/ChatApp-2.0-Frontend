@@ -5,6 +5,8 @@ import { UserContext } from "../context/user";
 import { useContext } from "react";
 import { ChatUserContext } from '../context/chatUser';
 import { useSocket } from '../context/socketContext';
+import { IoMdSettings } from "react-icons/io";
+import { Link } from "react-router-dom";
 function Sidebar() {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -87,12 +89,11 @@ function Sidebar() {
         } catch (error) {
             console.error('Error adding friend:', error);
         }
-        // Implement add friend functionality
+
     };
 
     const handleRemoveFriend = async () => {
         // alert(`${selectedUser.username} has been removed as a friend!`);
-        // Implement remove friend functionality
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/removefriend`, {
                 friendId: selectedUser._id,
@@ -131,6 +132,9 @@ function Sidebar() {
                     <h2 className="font-semibold text-lg">{user?.username}</h2>
                     <span className="text-sm text-gray-400">Active Now</span>
                 </div>
+                <Link to={`${process.env.REACT_APP_BASE_URL}/profile`}>
+                    <IoMdSettings size={24} style={{ 'marginRight': '1em' }} className="cursor-pointer" />
+                </Link>
                 <button onClick={togglePopup} className="bg-pink-500 text-white text-lg p-2 rounded-full w-11">+</button>
             </div>
 
