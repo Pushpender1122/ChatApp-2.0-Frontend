@@ -9,7 +9,7 @@ import { IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-function Sidebar() {
+function Sidebar({ setIsMenuOpen }) {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const { user } = useContext(UserContext);
@@ -70,7 +70,7 @@ function Sidebar() {
     );
     const handleChangeUser = (id, username, profileimg, email, description) => {
         console.log(id);
-
+        setIsMenuOpen(false);
         setChatUser({ id, username, profileimg, email, description });
     }
     const togglePopup = () => {
@@ -151,7 +151,7 @@ function Sidebar() {
     };
 
     return (
-        <div className="w-72 bg-gray-800 text-white flex flex-col p-4 ">
+        <div className="w-72 bg-gray-800 text-white flex flex-col p-4 h-full ">
             {/* Profile Section */}
             <div className="flex items-center mb-5">
                 <img
@@ -268,14 +268,14 @@ function Sidebar() {
                 <div className="space-y-3 hide-scrollbar ">
                     {filteredUsers.length > 0 ? (
                         filteredUsers.map(user => (
-                            <div key={user._id} className="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer">
+                            <div key={user._id} className="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer" onClick={() => handleChangeUser(user._id, user.username, user.profileimg, user.email, user.description)}>
                                 <img
                                     src={user.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
                                     alt={user.username}
                                     className="rounded-full w-10 h-10 mr-3"
                                 />
                                 <div className="flex-1">
-                                    <h4 className="font-semibold" onClick={() => handleChangeUser(user._id, user.username, user.profileimg, user.email, user.description)}>{user.username}</h4>
+                                    <h4 className="font-semibold" >{user.username}</h4>
                                     <p className="text-xs text-gray-400">Now</p>
                                 </div>
                                 {/* <div className=" bg-red-500  text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">

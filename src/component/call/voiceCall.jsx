@@ -23,26 +23,26 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
                     {
                         urls: "stun:stun.relay.metered.ca:80",
                     },
-                    {
-                        urls: "turn:global.relay.metered.ca:80",
-                        username,
-                        credential,
-                    },
-                    {
-                        urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                        username,
-                        credential,
-                    },
-                    {
-                        urls: "turn:global.relay.metered.ca:443",
-                        username,
-                        credential,
-                    },
-                    {
-                        urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                        username,
-                        credential,
-                    },
+                    // {
+                    //     urls: "turn:global.relay.metered.ca:80",
+                    //     username,
+                    //     credential,
+                    // },
+                    // {
+                    //     urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                    //     username,
+                    //     credential,
+                    // },
+                    // {
+                    //     urls: "turn:global.relay.metered.ca:443",
+                    //     username,
+                    //     credential,
+                    // },
+                    // {
+                    //     urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                    //     username,
+                    //     credential,
+                    // },
                 ]
             }
         });
@@ -140,11 +140,10 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
     }, [localStream, socket]);
 
     return (
-        <div>
-            <h1>{value === 'video' ? 'Video Call' : 'Voice Call'}</h1>
-
+        <div >
+            {/* <h1>{value === 'video' ? 'Video Call' : 'Voice Call'}</h1> */}
             {showCallPopup && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row">
                     {localStream && value === 'video' && (
                         <div className="relative flex flex-col items-center">
                             {isVideoHidden ? (
@@ -223,7 +222,9 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
                                     End Call
                                 </button>
                             </div>
+                            <audio ref={(audio) => audio && (audio.srcObject = remoteStream)} autoPlay />
                         </div>
+
                     )}
                 </div>
             )}

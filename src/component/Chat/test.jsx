@@ -20,6 +20,7 @@ function Test() {
     const [peerjsid, setPeerjsId] = useState(null);
     const [callType, setCallType] = useState(null);
     const [isVideoHidden, setIsVideoHidden] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const username = process.env.REACT_APP_METERED_USERNAME;
     const credential = process.env.REACT_APP_METERED_PASSWORD;
     useEffect(() => {
@@ -49,26 +50,26 @@ function Test() {
                         {
                             urls: "stun:stun.relay.metered.ca:80",
                         },
-                        {
-                            urls: "turn:global.relay.metered.ca:80",
-                            username,
-                            credential,
-                        },
-                        {
-                            urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                            username,
-                            credential,
-                        },
-                        {
-                            urls: "turn:global.relay.metered.ca:443",
-                            username,
-                            credential,
-                        },
-                        {
-                            urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                            username,
-                            credential,
-                        },
+                        // {
+                        //     urls: "turn:global.relay.metered.ca:80",
+                        //     username,
+                        //     credential,
+                        // },
+                        // {
+                        //     urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                        //     username,
+                        //     credential,
+                        // },
+                        // {
+                        //     urls: "turn:global.relay.metered.ca:443",
+                        //     username,
+                        //     credential,
+                        // },
+                        // {
+                        //     urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                        //     username,
+                        //     credential,
+                        // },
                     ]
                 }
             });
@@ -182,9 +183,13 @@ function Test() {
         }
     };
     return (
-        <div className="flex h-screen bg-gray-900">
-            <Sidebar />
-            <ChatWindow />
+        <div className="flex h-screen bg-gray-900" > {/* style={{ 'height': '93vh' }} */}
+            <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
+                <Sidebar setIsMenuOpen={setIsMenuOpen} />
+            </div>
+            {isMenuOpen && <Sidebar setIsMenuOpen={setIsMenuOpen} />}
+            {!isMenuOpen && <ChatWindow setIsMenuOpen={setIsMenuOpen} />}
+
             <UserFetch />
             {/* Incoming Call Popup */}
             {isCallPopupVisible && (
@@ -217,7 +222,7 @@ function Test() {
 
             {/* In-Call Popup */}
             {isInCall && (
-                <div className="fixed inset-0 flex items-center justify-center z-50" >
+                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row" >
                     {callType !== 'video' && (<div className="bg-white p-6 rounded-lg shadow-lg text-center">
                         <h2 className="text-lg font-bold mb-4">In Call with {incomingCall?.senderName}</h2>
                         <img

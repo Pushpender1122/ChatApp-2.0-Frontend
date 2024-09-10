@@ -3,8 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 const UserComponent = ({ user }) => {
-    // console.log("UserComponent", user);
     const [editMode, setEditMode] = useState(false);
     const [profileImage, setProfileImage] = useState(user?.profileimg);
     const navigate = useNavigate();
@@ -17,6 +17,7 @@ const UserComponent = ({ user }) => {
         description: user?.description,
         profileImage: user?.profileimg,
     });
+
     useEffect(() => {
         setUserData({
             username: user?.username,
@@ -26,6 +27,7 @@ const UserComponent = ({ user }) => {
         });
         setProfileImage(user?.profileimg);
     }, [user]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUserData({
@@ -62,35 +64,34 @@ const UserComponent = ({ user }) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('User updated successfully:', response.data);
             setEditMode(false);
         } catch (error) {
             console.error('Error updating user:', error);
         }
     };
-    const handlelogout = async () => {
+
+    const handleLogout = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/logout`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-            console.log('User logged out successfully:', response.data);
             localStorage.removeItem('token');
-            notify()
+            notify();
             setTimeout(() => {
                 navigate(`${process.env.REACT_APP_BASE_URL}/login`);
             }, 3000);
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error logging out user:', error);
         }
-    }
+    };
+
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-dark-blue-900 text-white">
-            <div className="w-full  p-8 bg-black  shadow-lg" style={{ 'height': '100vh' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-dark-blue-900 text-white px-4 md:px-8">
+            <div className="w-full md:w-3/4 p-8 bg-black shadow-lg" style={{ 'height': '100vh', 'width': '100vw' }}>
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-light-blue-500">User Profile</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-light-blue-500">User Profile</h1>
                     {!editMode && (
                         <button
                             onClick={() => setEditMode(true)}
@@ -99,25 +100,24 @@ const UserComponent = ({ user }) => {
                             Edit Profile
                         </button>
                     )}
-                    <div>
+                    <div className="flex space-x-2">
                         <button
                             onClick={() => navigate(`/`)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-2"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
                             Chat
                         </button>
                         <button
-                            onClick={handlelogout}
+                            onClick={handleLogout}
                             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         >
                             Logout
                         </button>
-
                     </div>
                 </div>
-                <div className="flex space-x-12">
+                <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-12">
                     <div className="flex-none">
-                        <div className="relative w-48 h-48">
+                        <div className="relative w-32 h-32 md:w-48 md:h-48 mx-auto">
                             <img
                                 src={profileImage || 'https://via.placeholder.com/150'}
                                 alt={userData?.username}
@@ -129,12 +129,10 @@ const UserComponent = ({ user }) => {
                                     accept="image/*"
                                     onChange={handleImageChange}
                                     className="absolute inset-0 opacity-0 cursor-pointer"
-                                    name='img'
                                 />
                             )}
                         </div>
                     </div>
-
                     <div className="flex-grow space-y-6">
                         <div>
                             <label className="block text-light-blue-500 font-semibold">Username</label>
@@ -148,7 +146,6 @@ const UserComponent = ({ user }) => {
                                     }`}
                             />
                         </div>
-
                         <div>
                             <label className="block text-light-blue-500 font-semibold">Email</label>
                             <input
@@ -161,7 +158,6 @@ const UserComponent = ({ user }) => {
                                     }`}
                             />
                         </div>
-
                         <div>
                             <label className="block text-light-blue-500 font-semibold">Description</label>
                             <textarea
@@ -176,7 +172,6 @@ const UserComponent = ({ user }) => {
                         </div>
                     </div>
                 </div>
-
                 {editMode && (
                     <div className="mt-8 flex justify-end space-x-4">
                         <button

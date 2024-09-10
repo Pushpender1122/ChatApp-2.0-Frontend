@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChatUserContext } from '../context/chatUser';
+import { IoMenu } from "react-icons/io5";
 import { useContext } from 'react';
 import { IoMdSettings } from "react-icons/io";
 import { IoMdCall } from "react-icons/io";
@@ -11,7 +12,7 @@ import axios from 'axios';
 import SettingPopup from '../setting/pop.setting';
 import Modal from '../utility/zoomimage';
 import VoiceCall from '../call/voiceCall';
-function ChatHeader() {
+function ChatHeader({ setIsMenuOpen }) {
     const { chatUser, setChatUser } = useContext(ChatUserContext);
     const socket = useSocket();
     const [hoveredIcon, setHoveredIcon] = useState(null);
@@ -113,7 +114,12 @@ function ChatHeader() {
     }, [user, notificationCount]);
     return (
         <div className="flex items-center justify-between p-5 bg-gray-800">
-            <div className="flex items-center">
+            <div className='block md:hidden cursor-pointer text-white' style={{ 'marginRight': '1rem' }} onClick={() => {
+                setIsMenuOpen(true);
+            }}>
+                <IoMenu size={20} />
+            </div>
+            <div className="flex items-center" style={{ 'fontSize': '13px' }}>
                 <img
                     src={chatUser?.profileimg || "https://plus.unsplash.com/premium_photo-1693007962731-c19c13af42c7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxN3x8fGVufDB8fHx8fA%3D%3D"}
                     onClick={() => {
@@ -126,10 +132,10 @@ function ChatHeader() {
                     <Modal image={chatUser?.profileimg} alt={'user'} onClose={() => setImageZoomShowModal(false)} />)}
                 <div className="ml-3">
                     <span className="block font-semibold text-white">{chatUser?.username}</span>
-                    <span className="block text-sm text-gray-400">Active Now</span>
+                    <span className="block text-sm text-gray-400" style={{ 'fontSize': '13px' }}>Active Now</span>
                 </div>
             </div>
-            <div className="flex items-center space-x-4 text-white">
+            <div className="flex items-center space-x-4 text-white" style={{ 'width': '9em' }}>
                 <div className="relative inline-block">
                     <button
                         className="p-2 bg-gray-700 rounded-full text-white"
@@ -137,7 +143,7 @@ function ChatHeader() {
                         onMouseLeave={handleMouseLeave}
                         onClick={togglePopup}
                     >
-                        <IoIosNotifications size={hoveredIcon === 'notifications' ? 24 : 20} />
+                        <IoIosNotifications size={hoveredIcon === 'notifications' ? 16 : 12} />
                     </button>
                     {notificationCount > 0 && (
                         <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
@@ -205,7 +211,7 @@ function ChatHeader() {
                     onClick={() => chatUser ? setShowSettingPopup(true) : setShowSettingPopup(false)}
 
                 >
-                    <IoMdSettings size={hoveredIcon === 'settings' ? 24 : 20} />
+                    <IoMdSettings size={hoveredIcon === 'settings' ? 16 : 12} />
                 </button>
                 {showSettingPopup && (<SettingPopup currentUser={user} user={chatUser} onClose={() => setShowSettingPopup(false)} setChatUser={setChatUser} socket={socket} setUser={setUser} setImageZoomShowModal={setImageZoomShowModal} />)}
                 <button
@@ -214,7 +220,7 @@ function ChatHeader() {
                     onMouseLeave={handleMouseLeave}
                     onClick={() => chatUser ? setShowVoiceCall(true) : setShowVoiceCall(false)}
                 >
-                    <IoMdCall size={hoveredIcon === 'call' ? 24 : 20} />
+                    <IoMdCall size={hoveredIcon === 'call' ? 16 : 12} />
                 </button>
                 {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} value={'voice'} />)}
                 <button
@@ -223,7 +229,7 @@ function ChatHeader() {
                     onMouseLeave={handleMouseLeave}
                     onClick={() => chatUser ? setShowVideoCall(true) : setShowVideoCall(false)}
                 >
-                    <FaVideo size={hoveredIcon === 'video' ? 24 : 20} />
+                    <FaVideo size={hoveredIcon === 'video' ? 16 : 12} />
                 </button>
                 {showVideoCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVideoCall(false)} value={'video'} />)}
 
