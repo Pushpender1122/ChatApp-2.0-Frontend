@@ -296,8 +296,8 @@ function Test() {
                         <video
                             ref={(video) => video && (video.srcObject = remoteStream)}
                             autoPlay
-                            className="w-full max-w-md"
-                            style={{ transform: 'scaleX(-1)' }}
+                            className="w-full max-w-md "
+                            style={{ transform: 'scaleX(-1)', height: '28rem' }}
                         ></video>
                     ) : (
                         <audio
