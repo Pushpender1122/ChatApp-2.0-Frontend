@@ -11,6 +11,7 @@ import { useContext } from 'react';
 import { UserContext } from './component/context/user';
 import Protectedlogin from "./component/private/Protectedlogin";
 import PrivateRoute from "./component/private/PrivateRoute";
+import VoiceCall from "./component/call/voiceCall";
 function App() {
   const { user } = useContext(UserContext);
   return (
@@ -28,6 +29,7 @@ function App() {
             element={<UserComponent user={user} />}
           />
           {/* )} */}
+          <Route exact path={process.env.REACT_APP_BASE_URL + "/call"} element={<VoiceCall />} />
         </Route>
         <Route element={<Protectedlogin />}>
           <Route exact path={process.env.REACT_APP_BASE_URL + "/signup"} element={<Signup />} />

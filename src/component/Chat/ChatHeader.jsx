@@ -112,6 +112,13 @@ function ChatHeader({ setIsMenuOpen }) {
             fetchFriendDetails();
         }
     }, [user, notificationCount]);
+    const handleSetData = (value) => {
+        sessionStorage.setItem('chatUser', JSON.stringify(chatUser));
+        sessionStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('value', value);
+        window.open(`${process.env.REACT_APP_BASE_URL}/call`, '_blank');
+        console.log(socket.id)
+    }
     return (
         <div className="flex items-center justify-between p-5 bg-gray-800">
             <div className='block md:hidden cursor-pointer text-white' style={{ 'marginRight': '1rem' }} onClick={() => {
@@ -151,8 +158,6 @@ function ChatHeader({ setIsMenuOpen }) {
                         </span>
                     )}
                 </div>
-
-
                 {/* Popup for Friend Requests */}
                 {showPopup && (
                     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
@@ -218,20 +223,23 @@ function ChatHeader({ setIsMenuOpen }) {
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('call')}
                     onMouseLeave={handleMouseLeave}
-                    onClick={() => chatUser ? setShowVoiceCall(true) : setShowVoiceCall(false)}
+                    onClick={() => chatUser ? handleSetData('voice') : ""}
                 >
                     <IoMdCall size={hoveredIcon === 'call' ? 16 : 12} />
                 </button>
-                {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} value={'voice'} />)}
+                {/* {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} value={'voice'} />)} */}
+                {/* {showVoiceCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVoiceCall(false)} value={'voice'} />)} */}
                 <button
                     className="p-2 bg-gray-700 rounded-full text-white"
                     onMouseEnter={() => handleMouseEnter('video')}
                     onMouseLeave={handleMouseLeave}
-                    onClick={() => chatUser ? setShowVideoCall(true) : setShowVideoCall(false)}
+                    // onClick={() => chatUser ? setShowVideoCall(true) : setShowVideoCall(false)}
+                    onClick={() => chatUser ? handleSetData('video') : ""}
                 >
+
                     <FaVideo size={hoveredIcon === 'video' ? 16 : 12} />
                 </button>
-                {showVideoCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVideoCall(false)} value={'video'} />)}
+                {/* {showVideoCall && (<VoiceCall user={user} chatUser={chatUser} onClose={() => setShowVideoCall(false)} value={'video'} />)} */}
 
             </div>
         </div >

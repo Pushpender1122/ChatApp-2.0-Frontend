@@ -143,7 +143,7 @@ function Test() {
                 setRemoteStream(remoteStream);
             });
         });
-        socket.emit('user-connected', { toUserId: calluserid, peerId: peerjsid });
+        socket.emit('user-connected', { toUserId: calluserid, peerId: peerjsid, senderId: user._id });
     };
 
     const handleDeclineCall = () => {

@@ -3,7 +3,10 @@ import { useSocket } from '../context/socketContext';
 import Peer from 'peerjs';
 import { FaMicrophone, FaVideoSlash, FaPhoneSlash } from 'react-icons/fa';
 
-const VoiceCall = ({ user, chatUser, onClose, value }) => {
+const VoiceCall = () => {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const chatUser = JSON.parse(sessionStorage.getItem('chatUser'));
+    const value = sessionStorage.getItem('value');
     const socket = useSocket();
     const [localStream, setLocalStream] = useState(null);
     const [showCallPopup, setShowCallPopup] = useState(false);
@@ -49,6 +52,7 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
         peerInstance.current = peer;
 
         peer.on('open', (id) => {
+            console.log('My peer ID is: ' + id);
             socket.emit('voice_call', {
                 toUserId: chatUser?.id,
                 peerId: id,
@@ -84,6 +88,7 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
         const handleCall = async () => {
             const stream = await getUserMedia();
             socket.on('user-connected', (data) => {
+                console.log('User connected:', data);
                 const call = peer.call(data.peerId, stream);
                 call?.on('stream', (remoteStream) => {
                     setRemoteStream(remoteStream);
@@ -95,12 +100,11 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
         handleCall();
         setIsCalling(true);
         setShowCallPopup(true);
-
         return () => {
             peerInstance.current?.destroy();
             localStream?.getTracks().forEach(track => track.stop());
         };
-    }, [chatUser, socket, user, value]);
+    }, [socket]);
 
     const toggleMute = () => {
         if (localStream) {
@@ -119,13 +123,14 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
     };
 
     const handleCallDisconnect = () => {
-        onClose(false);
+        // onClose(false);
         setShowCallPopup(false);
         peerInstance.current?.disconnect();
         peerInstance.current?.destroy();
         localStream?.getTracks().forEach(track => track.stop());
         setLocalStream(null);
         socket.emit('end-call', { toUserId: chatUser?.id });
+        window.close();
     };
 
     useEffect(() => {
@@ -135,10 +140,22 @@ const VoiceCall = ({ user, chatUser, onClose, value }) => {
             peerInstance.current?.destroy();
             localStream?.getTracks().forEach(track => track.stop());
             setLocalStream(null);
-            onClose(false);
+            window.close();
+            // onClose(false);
         });
     }, [localStream, socket]);
-
+    // useEffect(() => {
+    //     console.log('Socket:', socket);
+    //     socket.on('user-connected', (data) => {
+    //         console.log('User connected:', data);
+    //         // const call = peerInstance.current.call(data.peerId, localStream);
+    //         // call?.on('stream', (remoteStream) => {
+    //         //     setRemoteStream(remoteStream);
+    //         //     setIsCalling(false);
+    //         // });
+    //     });
+    // }, [])
+    console.log(socket.id)
     return (
         <div >
             {/* <h1>{value === 'video' ? 'Video Call' : 'Voice Call'}</h1> */}
