@@ -26,26 +26,26 @@ const VoiceCall = () => {
                     {
                         urls: "stun:stun.relay.metered.ca:80",
                     },
-                    // {
-                    //     urls: "turn:global.relay.metered.ca:80",
-                    //     username,
-                    //     credential,
-                    // },
-                    // {
-                    //     urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                    //     username,
-                    //     credential,
-                    // },
-                    // {
-                    //     urls: "turn:global.relay.metered.ca:443",
-                    //     username,
-                    //     credential,
-                    // },
-                    // {
-                    //     urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                    //     username,
-                    //     credential,
-                    // },
+                    {
+                        urls: "turn:global.relay.metered.ca:80",
+                        username,
+                        credential,
+                    },
+                    {
+                        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                        username,
+                        credential,
+                    },
+                    {
+                        urls: "turn:global.relay.metered.ca:443",
+                        username,
+                        credential,
+                    },
+                    {
+                        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                        username,
+                        credential,
+                    },
                 ]
             }
         });
@@ -140,27 +140,22 @@ const VoiceCall = () => {
             peerInstance.current?.destroy();
             localStream?.getTracks().forEach(track => track.stop());
             setLocalStream(null);
+            sessionStorage.removeItem('chatUser');
+            sessionStorage.removeItem('value');
+            sessionStorage.removeItem('user');
             window.close();
             // onClose(false);
         });
     }, [localStream, socket]);
-    // useEffect(() => {
-    //     console.log('Socket:', socket);
-    //     socket.on('user-connected', (data) => {
-    //         console.log('User connected:', data);
-    //         // const call = peerInstance.current.call(data.peerId, localStream);
-    //         // call?.on('stream', (remoteStream) => {
-    //         //     setRemoteStream(remoteStream);
-    //         //     setIsCalling(false);
-    //         // });
-    //     });
-    // }, [])
+    if (!chatUser || !user || !value) {
+        window.open('/', '_self');
+    }
     console.log(socket.id)
     return (
         <div >
             {/* <h1>{value === 'video' ? 'Video Call' : 'Voice Call'}</h1> */}
             {showCallPopup && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row">
+                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row" style={{ background: 'black' }}>
                     {localStream && value === 'video' && (
                         <div className="relative flex flex-col items-center">
                             {isVideoHidden ? (
@@ -214,7 +209,7 @@ const VoiceCall = () => {
                     )}
 
                     {value !== 'video' && (
-                        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center" style={{ 'background': 'rgb(31 41 55 / var(--tw-bg-opacity))' }}>
+                        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
                             <img
                                 src={chatUser?.profileimg || "https://via.placeholder.com/150"}
                                 alt="User Avatar"

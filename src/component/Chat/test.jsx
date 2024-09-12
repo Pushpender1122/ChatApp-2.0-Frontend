@@ -50,26 +50,26 @@ function Test() {
                         {
                             urls: "stun:stun.relay.metered.ca:80",
                         },
-                        // {
-                        //     urls: "turn:global.relay.metered.ca:80",
-                        //     username,
-                        //     credential,
-                        // },
-                        // {
-                        //     urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                        //     username,
-                        //     credential,
-                        // },
-                        // {
-                        //     urls: "turn:global.relay.metered.ca:443",
-                        //     username,
-                        //     credential,
-                        // },
-                        // {
-                        //     urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                        //     username,
-                        //     credential,
-                        // },
+                        {
+                            urls: "turn:global.relay.metered.ca:80",
+                            username,
+                            credential,
+                        },
+                        {
+                            urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                            username,
+                            credential,
+                        },
+                        {
+                            urls: "turn:global.relay.metered.ca:443",
+                            username,
+                            credential,
+                        },
+                        {
+                            urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                            username,
+                            credential,
+                        },
                     ]
                 }
             });
@@ -134,16 +134,27 @@ function Test() {
     };
 
     const handleAcceptCall = async () => {
-        const stream = await getUserMedia();
+
+        const obj = {
+            toUserId: calluserid,
+            peerId: peerjsid,
+            senderId: user._id,
+            callType: callType,
+            incomingCall: incomingCall
+        }
+        sessionStorage.setItem('currentCall', JSON.stringify(obj))
+        window.open(`${process.env.REACT_APP_BASE_URL}/incomingCall`, '_blank');
         setCallPopupVisible(false);
-        setIsInCall(true);
-        peerInstance.current.on('call', (call) => {
-            call.answer(stream);
-            call.on('stream', (remoteStream) => {
-                setRemoteStream(remoteStream);
-            });
-        });
-        socket.emit('user-connected', { toUserId: calluserid, peerId: peerjsid, senderId: user._id });
+        // const stream = await getUserMedia();
+        // setCallPopupVisible(false);
+        // setIsInCall(true);
+        // peerInstance.current.on('call', (call) => {
+        //     call.answer(stream);
+        //     call.on('stream', (remoteStream) => {
+        //         setRemoteStream(remoteStream);
+        //     });
+        // });
+        // socket.emit('user-connected', { toUserId: calluserid, peerId: peerjsid, senderId: user._id });
     };
 
     const handleDeclineCall = () => {

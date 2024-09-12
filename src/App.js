@@ -12,6 +12,7 @@ import { UserContext } from './component/context/user';
 import Protectedlogin from "./component/private/Protectedlogin";
 import PrivateRoute from "./component/private/PrivateRoute";
 import VoiceCall from "./component/call/voiceCall";
+import CallPage from "./component/call/callpage";
 function App() {
   const { user } = useContext(UserContext);
   return (
@@ -30,6 +31,7 @@ function App() {
           />
           {/* )} */}
           <Route exact path={process.env.REACT_APP_BASE_URL + "/call"} element={<VoiceCall />} />
+          <Route exact path={process.env.REACT_APP_BASE_URL + "/incomingCall"} element={<CallPage />} />
         </Route>
         <Route element={<Protectedlogin />}>
           <Route exact path={process.env.REACT_APP_BASE_URL + "/signup"} element={<Signup />} />
