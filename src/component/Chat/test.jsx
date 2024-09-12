@@ -84,29 +84,6 @@ function Test() {
                 setPeerjsId(id);
             });
 
-            const getUserMedia = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        audio: true,
-                        video: true,
-                    });
-                    console.log('Local stream:', stream);
-                    setLocalStream(stream);
-                    return stream;
-                } catch (error) {
-                    console.error('Error getting user media:', error);
-                }
-            };
-
-            const handleAnswerCall = async () => {
-                const stream = await getUserMedia();
-                peer.on('call', (call) => {
-                    call.answer(stream);
-                    call.on('stream', (remoteStream) => {
-                        setRemoteStream(remoteStream);
-                    });
-                });
-            };
         });
         return () => {
             socket.off('voice_call');
@@ -114,24 +91,24 @@ function Test() {
     }, [socket]);
 
 
-    useEffect(() => {
-        socket.on('end-call', () => {
-            removeCallTrack();
-            setIsInCall(false);
-            peerInstance.current?.disconnect();
-            peerInstance.current?.destroy();
-        });
-    }, [localStream]);
+    // useEffect(() => {
+    //     socket.on('end-call', () => {
+    //         removeCallTrack();
+    //         setIsInCall(false);
+    //         peerInstance.current?.disconnect();
+    //         peerInstance.current?.destroy();
+    //     });
+    // }, [localStream]);
 
-    const getUserMedia = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === 'video' ? true : false });
-            setLocalStream(stream);
-            return stream;
-        } catch (error) {
-            console.error('Error getting user media:', error);
-        }
-    };
+    // const getUserMedia = async () => {
+    //     try {
+    //         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === 'video' ? true : false });
+    //         setLocalStream(stream);
+    //         return stream;
+    //     } catch (error) {
+    //         console.error('Error getting user media:', error);
+    //     }
+    // };
 
     const handleAcceptCall = async () => {
 
@@ -162,37 +139,37 @@ function Test() {
         socket.emit('end-call', { toUserId: incomingCall.senderId });
     };
 
-    const handleMute = () => {
-        if (localStream) {
-            const audioTrack = localStream.getAudioTracks()[0];
-            audioTrack.enabled = !audioTrack.enabled;
-            setIsMuted(!audioTrack.enabled);
-        }
-    };
+    // const handleMute = () => {
+    //     if (localStream) {
+    //         const audioTrack = localStream.getAudioTracks()[0];
+    //         audioTrack.enabled = !audioTrack.enabled;
+    //         setIsMuted(!audioTrack.enabled);
+    //     }
+    // };
 
-    const handleEndCall = () => {
-        setIsInCall(false);
-        if (peerInstance.current) {
-            peerInstance.current.disconnect();
-            peerInstance.current.destroy();
-            removeCallTrack();
-            socket.emit('end-call', { toUserId: incomingCall.senderId });
-        }
-    };
+    // const handleEndCall = () => {
+    //     setIsInCall(false);
+    //     if (peerInstance.current) {
+    //         peerInstance.current.disconnect();
+    //         peerInstance.current.destroy();
+    //         removeCallTrack();
+    //         socket.emit('end-call', { toUserId: incomingCall.senderId });
+    //     }
+    // };
 
-    const removeCallTrack = () => {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            setLocalStream(null);
-        }
-    };
-    const toggleVideoHide = () => {
-        if (localStream) {
-            const newIsVideoHidden = !isVideoHidden;
-            localStream.getVideoTracks().forEach(track => (track.enabled = !newIsVideoHidden));
-            setIsVideoHidden(newIsVideoHidden);
-        }
-    };
+    // const removeCallTrack = () => {
+    //     if (localStream) {
+    //         localStream.getTracks().forEach(track => track.stop());
+    //         setLocalStream(null);
+    //     }
+    // };
+    // const toggleVideoHide = () => {
+    //     if (localStream) {
+    //         const newIsVideoHidden = !isVideoHidden;
+    //         localStream.getVideoTracks().forEach(track => (track.enabled = !newIsVideoHidden));
+    //         setIsVideoHidden(newIsVideoHidden);
+    //     }
+    // };
     return (
         <div className="flex h-screen bg-gray-900" > {/* style={{ 'height': '93vh' }} */}
             <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
@@ -232,7 +209,7 @@ function Test() {
             )}
 
             {/* In-Call Popup */}
-            {isInCall && (
+            {/* {isInCall && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row" >
                     {callType !== 'video' && (<div className="bg-white p-6 rounded-lg shadow-lg text-center">
                         <h2 className="text-lg font-bold mb-4">In Call with {incomingCall?.senderName}</h2>
@@ -257,7 +234,6 @@ function Test() {
                         </div>
                     </div>)}
 
-                    {/* Conditionally Render Audio or Video */}
                     {callType === 'video' ? (
                         <>
                             <div className="relative flex flex-col items-center">
@@ -317,7 +293,7 @@ function Test() {
                         ></audio>
                     )}
                 </div>
-            )}
+            )} */}
         </div>
     );
 }
