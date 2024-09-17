@@ -130,8 +130,9 @@ function ChatMessages() {
                     }}
                     placeholder="Type a message"
                     className="flex-1 bg-gray-700 text-white p-3 rounded-full outline-none mr-3"
+                    disabled={!chatUser}
                 />
-                <button onClick={handleSend} className="bg-pink-500 p-3 rounded-full">
+                <button onClick={handleSend} className="bg-pink-500 p-3 rounded-full" disabled={!chatUser}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
