@@ -19,6 +19,7 @@ function Sidebar({ setIsMenuOpen }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [friends, setFriends] = useState([])
     const socket = useSocket();
+    const [messageNotification, setMessageNotification] = useState([]);
     const [alertmsg, setAlertmsg] = useState({
         message: '',
         type: 'success',
@@ -26,8 +27,6 @@ function Sidebar({ setIsMenuOpen }) {
     const notify = () => toast[alertmsg.type](alertmsg.message, {
         autoClose: 2000,
     });
-
-
     useEffect(() => {
         // Fetch users when the component mounts
         const getUser = async () => {
@@ -45,6 +44,7 @@ function Sidebar({ setIsMenuOpen }) {
     useEffect(() => {
         if (user) {
             setUsers(users.filter((use) => use._id !== user?._id));
+            setMessageNotification(user.messageStatus);
         }
     }, [user]);
     useEffect(() => {
@@ -69,9 +69,10 @@ function Sidebar({ setIsMenuOpen }) {
         user.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const handleChangeUser = (id, username, profileimg, email, description) => {
-        console.log(id);
         setIsMenuOpen(false);
         setChatUser({ id, username, profileimg, email, description });
+        socket.emit('messageStatus', { SenderID: user._id, ReceiverId: id });
+        setMessageNotification(messageNotification.filter(m => m.userId !== id));
     }
     const togglePopup = () => {
         setShowPopup(!showPopup);
@@ -149,7 +150,11 @@ function Sidebar({ setIsMenuOpen }) {
             console.error('Error removing friend:', error);
         }
     };
-
+    useEffect(() => {
+        socket.on('messageNotification', (data) => {
+            setMessageNotification((prevMessages) => [...prevMessages, { userId: data.SenderID, status: true }]);
+        });
+    }, [socket]);
     return (
         <>
             <div className="w-72 bg-gray-800 text-white flex flex-col p-4 h-full ">
@@ -268,19 +273,21 @@ function Sidebar({ setIsMenuOpen }) {
                     <h3 className="text-sm text-gray-400 mb-2 hide-scrollbar">ACTIVE NOW</h3>
                     <div className="space-y-3 hide-scrollbar ">
                         {filteredUsers.length > 0 ? (
-                            filteredUsers.map(user => (
-                                <div key={user._id} className="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer" onClick={() => handleChangeUser(user._id, user.username, user.profileimg, user.email, user.description)}>
+                            filteredUsers.map(u => (
+                                <div key={u._id} className="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer" onClick={() => handleChangeUser(u._id, u.username, u.profileimg, u.email, u.description)}>
                                     <img
-                                        src={user.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
-                                        alt={user.username}
+                                        src={u.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
+                                        alt={u.username}
                                         className="rounded-full w-10 h-10 mr-3"
                                     />
                                     <div className="flex-1">
-                                        <h4 className="font-semibold" >{user.username}</h4>
+                                        <h4 className="font-semibold" >{u.username}</h4>
                                         <p className="text-xs text-gray-400">Now</p>
                                     </div>
-                                    {/* <div className=" bg-red-500  text-xs font-bold rounded-full w-2 h-2 flex items-center justify-center">
-                                    </div> */}
+                                    {messageNotification.some((m) => m.userId === u._id && m.status === true) && (
+                                        <div className="w-2 h-2  rounded-full" style={{ backgroundColor: 'rgb(1 122 160)' }}></div>
+                                    )}
+
                                 </div>
                             ))
                         ) : (
@@ -289,7 +296,7 @@ function Sidebar({ setIsMenuOpen }) {
                         <ToastContainer />
                     </div>
                 </div>
-            </div>
+            </div >
             <div className="z-50  w-auto md:hidden" style={{ color: 'rgb(17 24 39 / var(--tw-bg-opacity))' }} onClick={() => setIsMenuOpen(false)}>div test te</div>
         </>
     );
