@@ -14,6 +14,11 @@ const UserFetch = () => {
                     },
                 });
                 const data = await response.json();
+                if (data.message === 'Invalid token.') {
+                    localStorage.removeItem('token');
+                    setUser(null);
+                    return;
+                }
                 setUser(data.user);
             } catch (error) {
                 console.error('Error fetching user:', error);

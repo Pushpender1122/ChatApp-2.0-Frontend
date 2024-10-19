@@ -9,6 +9,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [templogin, setTemplogin] = useState(false);
     const notify = () => toast.success("Login Successful!", {
         autoClose: 2000,
     });
@@ -16,15 +17,16 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
-        if (!email || !password) {
-            setError('All fields are required');
-            setLoading(false);
-            return;
+        if (!templogin) {
+            if (!email || !password) {
+                setError('All fields are required');
+                setLoading(false);
+                return;
+            }
         }
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}${templogin ? '/templogin' : '/login'}`, {
                 email,
                 password,
             });
@@ -82,6 +84,15 @@ const Login = () => {
                             type="submit"
                             className={`w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={loading}
+                            onClick={() => setTemplogin(true)}
+                        >
+                            {loading ? 'Logging in...' : 'Login as a Guest'}
+                        </button>
+                        <button
+                            type="submit"
+                            className={`mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={loading}
+
                         >
                             {loading ? 'Logging in...' : 'Log In'}
                         </button>

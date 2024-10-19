@@ -128,7 +128,7 @@ function ChatHeader({ setIsMenuOpen }) {
             </div>
             <div className="flex items-center" style={{ 'fontSize': '13px' }}>
                 <img
-                    src={chatUser?.profileimg || "https://plus.unsplash.com/premium_photo-1693007962731-c19c13af42c7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxN3x8fGVufDB8fHx8fA%3D%3D"}
+                    src={chatUser?.profileimg || "https://cdn-icons-png.flaticon.com/512/149/149071.png "}
                     onClick={() => {
                         setImageZoomShowModal(true);
                     }}
