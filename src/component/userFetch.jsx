@@ -1,9 +1,10 @@
 import React, { useEffect, useContext } from 'react';
 import { UserContext } from './context/user';
+import { useNavigate } from 'react-router-dom';
 
 const UserFetch = () => {
     const { user, setUser } = useContext(UserContext);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -17,6 +18,7 @@ const UserFetch = () => {
                 if (data.message === 'Invalid token.') {
                     localStorage.removeItem('token');
                     setUser(null);
+                    navigate('/api/v1/login');
                     return;
                 }
                 setUser(data.user);

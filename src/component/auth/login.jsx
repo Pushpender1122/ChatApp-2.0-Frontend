@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/user';
 const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [templogin, setTemplogin] = useState(false);
+    const { setUser } = useContext(UserContext);
     const notify = () => toast.success("Login Successful!", {
         autoClose: 2000,
     });
@@ -43,7 +45,7 @@ const Login = () => {
             setEmail('');
             setPassword('');
             setTimeout(() => {
-
+                setUser(null);
                 navigate('/');
             }, 3000);
         } catch (err) {
