@@ -458,7 +458,7 @@ function Sidebar({ setIsMenuOpen }) {
                     </div>
                 </div>
             </div >
-            <div className="z-50  w-full md:hidden" style={{ color: 'rgb(17 24 39 / var(--tw-bg-opacity))' }} onClick={() => setIsMenuOpen(false)}>div test te</div>
+            <div className="z-50  w-auto md:hidden" style={{ color: 'rgb(17 24 39 / var(--tw-bg-opacity))' }} onClick={() => setIsMenuOpen(false)}>div test te</div>
         </>
     );
 }
