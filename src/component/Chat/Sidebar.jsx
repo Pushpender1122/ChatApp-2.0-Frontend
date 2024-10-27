@@ -246,7 +246,7 @@ function Sidebar({ setIsMenuOpen }) {
     }, [])
     return (
         <>
-            <div className="w-72 bg-gray-800 text-white flex flex-col p-4 h-full ">
+            <div className="w-10/12 md:w-72 bg-gray-800 text-white flex flex-col p-4 h-full ">
                 {/* Profile Section */}
                 <div className="flex items-center mb-5">
                     <img
@@ -445,8 +445,9 @@ function Sidebar({ setIsMenuOpen }) {
                                         <p className="text-xs text-gray-400">Now</p>
                                     </div>
                                     {messageNotification.some((m) => m.userId === u._id && m.status === true) && (
-                                        <div className="w-2 h-2  rounded-full" style={{ backgroundColor: 'rgb(1 122 160)' }}></div>
+                                        <div className="w-2 h-2  rounded-full text-sm" style={{ backgroundColor: 'rgb(1 122 160)' }}></div>
                                     )}
+                                    {console.log("This is messageNotification", messageNotification)}
 
                                 </div>
                             ))

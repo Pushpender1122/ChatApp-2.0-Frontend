@@ -11,7 +11,7 @@ function ChatWindow({ setIsMenuOpen }) {
         <div className="flex flex-1 flex-col bg-gray-900" >
             {chatUser && <ChatHeader setIsMenuOpen={setIsMenuOpen} />}
             {chatUser && <ChatMessages />}
-            {!chatUser && <WelcomeMessage />}
+            {!chatUser && <WelcomeMessage setIsMenuOpen={setIsMenuOpen} />}
 
             {/* <ChatHeader setIsMenuOpen={setIsMenuOpen} /> */}
             {/* <ChatMessages /> */}
