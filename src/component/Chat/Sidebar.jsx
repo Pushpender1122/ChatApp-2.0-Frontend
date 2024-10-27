@@ -5,14 +5,14 @@ import { UserContext } from "../context/user";
 import { useContext } from "react";
 import { ChatUserContext } from '../context/chatUser';
 import { useSocket } from '../context/socketContext';
-import { IoMdSettings } from "react-icons/io";
+import { IoIosNotifications, IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 function Sidebar({ setIsMenuOpen }) {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const { user } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const { setChatUser, chatUser } = useContext(ChatUserContext);
     const [showPopup, setShowPopup] = useState(false);
     const [searchUserPublic, setSearchUserPublic] = useState('');
@@ -20,6 +20,9 @@ function Sidebar({ setIsMenuOpen }) {
     const [friends, setFriends] = useState([])
     const socket = useSocket();
     const [messageNotification, setMessageNotification] = useState([]);
+    const [notificationCount, setNotificationCount] = useState(0);
+    const [friendRequests, setFriendRequests] = useState([]);
+    const [showPopupFriendRequest, setShowPopupFriendRequest] = useState(false);
     const [alertmsg, setAlertmsg] = useState({
         message: '',
         type: 'success',
@@ -27,6 +30,59 @@ function Sidebar({ setIsMenuOpen }) {
     const notify = () => toast[alertmsg.type](alertmsg.message, {
         autoClose: 2000,
     });
+    const togglePopupForFriends = () => {
+        setShowPopupFriendRequest(!showPopupFriendRequest);
+    };
+
+    const handleAccept = async (id) => {
+        // Handle accept friend request
+        console.log(`Accepted request from user with id: ${id}`);
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/accecptfriendrequest`, {
+                friendId: id,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            console.log(response.data);
+            if (response.status === 200) {
+                setFriendRequests((prevRequests) =>
+                    prevRequests.filter((request) => request._id !== id)
+                );
+                setNotificationCount((prevCount) => prevCount - 1);
+                socket.emit('friendAccecptAck', { ReceiverId: id });
+                setUser(null);
+                setShowPopupFriendRequest(false);
+            }
+        } catch (error) {
+            console.error('Error accepting friend request:', error);
+        }
+    };
+
+    const handleReject = async (id) => {
+        // Handle reject friend request
+        console.log(`Rejected request from user with id: ${id}`);
+        try {
+            const responce = await axios.post(`${process.env.REACT_APP_API_URL}/rejectfriendrequest`, {
+                friendId: id,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            // console.log(responce);
+            if (responce.status === 200) {
+                setFriendRequests((prevRequests) =>
+                    prevRequests.filter((request) => request._id !== id)
+                );
+                setNotificationCount((prevCount) => prevCount - 1);
+                setShowPopupFriendRequest(false);
+            }
+        } catch (error) {
+            console.error('Error rejecting friend request:', error);
+        }
+    };
     useEffect(() => {
         // Fetch users when the component mounts
         const getUser = async () => {
@@ -51,6 +107,7 @@ function Sidebar({ setIsMenuOpen }) {
         socket.on('FriendRemove', (data) => {
             // console.log('FriendRemove:', data);
             setFriends(prevFriends => prevFriends.filter(f => f._id !== data.senderId));
+            setChatUser(null);
         })
     }, []);
     useEffect(() => {
@@ -157,10 +214,36 @@ function Sidebar({ setIsMenuOpen }) {
         }
     };
     useEffect(() => {
+        const fetchFriendDetails = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/friendDetails`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                console.log(response.data);
+                setFriendRequests(response.data);
+            } catch (error) {
+                console.error('Error fetching friend requests:', error);
+            }
+        };
+        if (user) {
+            fetchFriendDetails();
+        }
+    }, [user, notificationCount]);
+    useEffect(() => {
         socket.on('messageNotification', (data) => {
             setMessageNotification((prevMessages) => [...prevMessages, { userId: data.SenderID, status: true }]);
         });
+        socket.on('friendNotification', ({ count }) => {
+            setNotificationCount(count);
+        });
     }, [socket]);
+    useEffect(() => {
+        socket.on('FriendAcceptAck', () => {
+            setUser(null);
+        })
+    }, [])
     return (
         <>
             <div className="w-72 bg-gray-800 text-white flex flex-col p-4 h-full ">
@@ -176,9 +259,80 @@ function Sidebar({ setIsMenuOpen }) {
                         <span className="text-sm text-gray-400">Active Now</span>
                     </div>
                     <Link to={`${process.env.REACT_APP_BASE_URL}/profile`}>
-                        <IoMdSettings size={24} style={{ 'marginRight': '1em' }} className="cursor-pointer" />
+                        <IoMdSettings style={{ 'marginRight': '1em' }} className="cursor-pointer" />
                     </Link>
-                    <button onClick={togglePopup} className="bg-pink-500 text-white text-lg p-2 rounded-full w-11">+</button>
+                    <button onClick={togglePopup} className="bg-pink-500 text-white text-lg p-2 rounded-full" style={{
+                        height: '1.7rem',
+                        width: '1.7rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>+</button>
+                    <div className="relative inline-block">
+                        <button
+                            className="p-2 bg-gray-700 rounded-full text-white ml-2"
+                            onClick={togglePopupForFriends}
+                        >
+                            <IoIosNotifications />
+                        </button>
+
+                        {notificationCount > 0 && (
+                            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">
+                                {notificationCount}
+                            </span>
+                        )}
+                    </div>
+                    {/* Popup for Friend Requests */}
+                    {showPopupFriendRequest && (
+                        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-bold text-gray-800">Friend Requests</h2>
+                                    <button
+                                        onClick={togglePopupForFriends}
+                                        className="text-gray-500 hover:text-gray-800 text-lg"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                                {friendRequests.length > 0 ? (
+                                    <ul>
+                                        {friendRequests.map((request) => (
+                                            <li
+                                                key={request.id}
+                                                className="flex items-center mb-4"
+                                            >
+                                                <img
+                                                    src={request.profileimg}
+                                                    alt={request.username}
+                                                    className="w-12 h-12 rounded-full mr-4"
+                                                />
+                                                <div className="flex-1">
+                                                    <h3 className="text-lg font-semibold text-gray-800">{request.username}</h3>
+                                                </div>
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => handleAccept(request._id)}
+                                                        className="bg-green-500 text-white py-1 px-3 rounded-lg hover:bg-green-600"
+                                                    >
+                                                        Accept
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(request._id)}
+                                                        className="bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-600">No friend requests</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Popup */}
@@ -187,7 +341,7 @@ function Sidebar({ setIsMenuOpen }) {
                         <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
                             <div className="flex justify-between items-center mb-4">
                                 {!selectedUser ? (
-                                    <h2 className="text-2xl font-bold text-gray-800">Select User</h2>
+                                    <h2 className="text-2xl font-bold` text-gray-800">Select User</h2>
                                 ) : (
                                     <h2 className="text-2xl font-bold text-gray-800">{selectedUser.name}</h2>
                                 )}

@@ -191,7 +191,7 @@ function ChatMessages() {
             </div>
 
 
-            <div className="p-4 bg-gray-800 flex items-center">
+            <div className="p-4  flex items-center">
                 <input
                     type="text"
                     value={newMessage}
