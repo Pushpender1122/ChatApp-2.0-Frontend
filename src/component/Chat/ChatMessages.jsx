@@ -33,7 +33,10 @@ function ChatMessages() {
         const timeoutId = setTimeout(scrollToBottom, 500);
         return () => clearTimeout(timeoutId);
     }, [messages]);
-
+    const handleTyping = (e) => {
+        setNewMessage(e.target.value);
+        socket.emit('isTyping', { ReceiverId: chatUser?.id, SenderId: user?._id });
+    };
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -192,7 +195,7 @@ function ChatMessages() {
                 <input
                     type="text"
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => handleTyping(e)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             e.preventDefault(); // Prevent default form submission

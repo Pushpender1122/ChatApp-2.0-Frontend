@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChatUserContext } from '../context/chatUser';
 import { IoMenu } from "react-icons/io5";
 import { useContext } from 'react';
@@ -22,8 +22,9 @@ function ChatHeader({ setIsMenuOpen }) {
     const { user, setUser } = useContext(UserContext);
     const [showSettingPopup, setShowSettingPopup] = useState(false);
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
-    const [showVoiceCall, setShowVoiceCall] = useState(false);
-    const [showVideoCall, setShowVideoCall] = useState(false);
+    const [status, setStatus] = useState('offline');
+    const [typingStatus, setTypingStatus] = useState(null);
+    const typingTimeoutRef = useRef(null);
     const togglePopup = () => {
         setShowPopup(!showPopup);
     };
@@ -87,7 +88,22 @@ function ChatHeader({ setIsMenuOpen }) {
             socket.on('friendNotification', ({ count }) => {
                 setNotificationCount(count);
             });
+            socket.on('isTyping', ({ status }) => {
+                setTypingStatus(status);
+                if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current);
+                }
+                typingTimeoutRef.current = setTimeout(() => {
+                    setTypingStatus(null);
+                }, 2000);
+            });
         }
+        return () => {
+            socket.off('isTyping');
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
     }, [socket]);
     useEffect(() => {
         socket.on('FriendAcceptAck', () => {
@@ -112,6 +128,31 @@ function ChatHeader({ setIsMenuOpen }) {
             fetchFriendDetails();
         }
     }, [user, notificationCount]);
+    useEffect(() => {
+        if (socket && chatUser) {
+            socket.emit('isActive', { ReceiverId: chatUser.id });
+            socket.on('isActive', (data) => {
+                // console.log("isActive", data)
+                if (data.status) {
+                    setStatus('online');
+                }
+                else if (data.userId) {
+                    if (data.userId === chatUser.id) {
+                        setStatus('online');
+                    }
+                }
+                else if (data.disconnectedUserId) {
+                    if (data.disconnectedUserId === chatUser.id) {
+                        setStatus('offline');
+                    }
+                }
+                else {
+                    setStatus('offline');
+                }
+            })
+        }
+    }, [socket, chatUser]);
+
     const handleSetData = (value) => {
         sessionStorage.setItem('chatUser', JSON.stringify(chatUser));
         sessionStorage.setItem('user', JSON.stringify(user));
@@ -139,7 +180,7 @@ function ChatHeader({ setIsMenuOpen }) {
                     <Modal image={chatUser?.profileimg} alt={'user'} onClose={() => setImageZoomShowModal(false)} />)}
                 <div className="ml-3">
                     <span className="block font-semibold text-white">{chatUser?.username}</span>
-                    <span className="block text-sm text-gray-400" style={{ 'fontSize': '13px' }}>Active Now</span>
+                    <span className="block text-sm text-gray-400" style={{ 'fontSize': '13px' }}>{typingStatus || status}</span>
                 </div>
             </div>
             <div className="flex items-center space-x-4 text-white" style={{ 'width': '9em' }}>

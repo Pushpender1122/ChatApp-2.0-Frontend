@@ -34,7 +34,7 @@ function Sidebar({ setIsMenuOpen }) {
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
                 setUsers(response.data);
 
-                console.log("This is getAlluser", response.data);
+                // console.log("This is getAlluser", response.data);
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
@@ -49,13 +49,13 @@ function Sidebar({ setIsMenuOpen }) {
     }, [user]);
     useEffect(() => {
         socket.on('FriendRemove', (data) => {
-            console.log('FriendRemove:', data);
+            // console.log('FriendRemove:', data);
             setFriends(prevFriends => prevFriends.filter(f => f._id !== data.senderId));
         })
     }, []);
     useEffect(() => {
         if (user && users) {
-            console.log("This is users for 39 sidebar", users);
+            // console.log("This is users for 39 sidebar", users);
             setFriends([]);
             users.forEach((use) => {
                 if (user.friends?.includes(use._id)) {
@@ -100,7 +100,7 @@ function Sidebar({ setIsMenuOpen }) {
                 });
                 socket.emit('friendRequest', { ReceiverId: selectedUser._id });
             }
-            console.log('Friend added:', response.data.message);
+            // console.log('Friend added:', response.data.message);
             setShowPopup(!showPopup);
             setSelectedUser(null);
         } catch (error) {
@@ -129,7 +129,7 @@ function Sidebar({ setIsMenuOpen }) {
                 },
             });
             if (response.data.message === 'Friend removed successfully') {
-                console.log('Friend removed:', response.data.message);
+                // console.log('Friend removed:', response.data.message);
                 setAlertmsg({
                     message: response.data.message,
                     type: 'success',
