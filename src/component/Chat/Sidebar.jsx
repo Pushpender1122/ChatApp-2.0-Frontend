@@ -101,6 +101,8 @@ function Sidebar({ setIsMenuOpen }) {
                 socket.emit('friendRequest', { ReceiverId: selectedUser._id });
             }
             console.log('Friend added:', response.data.message);
+            setShowPopup(!showPopup);
+            setSelectedUser(null);
         } catch (error) {
             setAlertmsg({
                 message: error.response.data.message,
@@ -141,6 +143,8 @@ function Sidebar({ setIsMenuOpen }) {
                     setChatUser(null);
 
                 }
+                setShowPopup(!showPopup);
+                setSelectedUser(null);
             }
         } catch (error) {
             setAlertmsg({
@@ -148,6 +152,8 @@ function Sidebar({ setIsMenuOpen }) {
                 type: 'error',
             });
             console.error('Error removing friend:', error);
+            setShowPopup(!showPopup);
+            setSelectedUser(null);
         }
     };
     useEffect(() => {

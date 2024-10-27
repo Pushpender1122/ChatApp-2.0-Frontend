@@ -3,7 +3,9 @@ import { UserContext } from '../context/user';
 import { useSocket } from '../context/socketContext';
 import { ChatUserContext } from '../context/chatUser';
 import axios from 'axios';
-
+import { LuUpload } from "react-icons/lu";
+import Dropzone from 'react-dropzone'
+import Modal from '../utility/zoomimage';
 function ChatMessages() {
     const { user } = useContext(UserContext);
     const { chatUser } = useContext(ChatUserContext);
@@ -11,13 +13,25 @@ function ChatMessages() {
     // const [messageQueue, setMessageQueue] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const socket = useSocket();
-    const messageContainerRef = useRef(null);  // Step 1: Create a ref
-
+    const messageContainerRef = useRef(null); // Reference to the message container div for scrolling
+    const [showImageZoomModal, setImageZoomShowModal] = useState(false);
+    const [zoomImage, zoomSetImage] = useState('');
+    const [uploadStatus, setUploadStatus] = useState(null);
     // Automatically scroll to the bottom when messages change
     useEffect(() => {
-        if (messageContainerRef.current) {
-            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
-        }
+        const scrollToBottom = () => {
+            if (messageContainerRef.current) {
+                messageContainerRef.current.scrollTo({
+                    top: messageContainerRef.current.scrollHeight,
+                    behavior: 'smooth',
+                });
+            }
+        };
+
+        scrollToBottom();
+
+        const timeoutId = setTimeout(scrollToBottom, 500);
+        return () => clearTimeout(timeoutId);
     }, [messages]);
 
     useEffect(() => {
@@ -58,6 +72,7 @@ function ChatMessages() {
                         fromUserId: data.fromUserId,
                         message: data.message,
                         senderAvatar: data.senderAvatar,
+                        filetype: data.fileType,
                     },
                 ]);
 
@@ -85,38 +100,94 @@ function ChatMessages() {
             setNewMessage('');
         }
     };
+    const handleDrop = async (acceptedFiles) => {
+        const file = acceptedFiles[0];
+        const reader = new FileReader();
+        setUploadStatus("uploading");
+        reader.onloadend = () => {
 
+            socket.emit('upload-file', { file: reader.result, name: file.name }, (response) => {
+                if (response.error) {
+                    console.error(response.error);
+                    setUploadStatus("error");
+                } else {
+                    const fileexe = file.name.split('.').pop();
+                    console.log(fileexe);
+                    setUploadStatus("uploaded");
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        {
+                            fromUserId: user._id,
+                            message: response.url,
+                            senderAvatar: user?.profileimg,
+                            filetype: fileexe,
+                        },
+                    ]);
+                    console.log(response.url);
+                    socket.emit('private_message', { toUserId: chatUser.id, message: response.url, SenderID: user._id, fileType: fileexe });
+                    setTimeout(() => {
+                        setUploadStatus(null);
+                    }, 2000);
+                }
+            });
+        };
+        reader.readAsDataURL(file); // it will convert file to base64 string and trigger onloadendz
+        // const obj = { fromUserId: user._id, file: file, senderAvatar: user?.profileimg, fileType: file.type, fileName: file.name }
+        // socket.emit('private_message', { toUserId: chatUser.id, message: obj, SenderID: user._id });
+    }
+    const handleZoom = (e) => {
+        zoomSetImage(e.target.src);
+        setImageZoomShowModal(true);
+    }
     return (
         <>
-            <div ref={messageContainerRef} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar"> {/* Step 1: Attach ref */}
+            <div ref={messageContainerRef} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
                 {messages?.map((msg, index) => (
                     <div
                         key={index}
-                        className={`flex items-end mb-4 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
+                        className={`flex items-end mb-6 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
                     >
+                        {/* Display profile image if message is from another user */}
                         {msg?.fromUserId !== user?._id && (
                             <img
                                 src={chatUser?.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
                                 alt="Sender"
-                                className="rounded-full w-10 h-10 mr-3"
+                                className="rounded-full w-10 h-10 mr-3 shadow-lg"
                             />
                         )}
+
                         <div
-                            className={`bg-gray-700 text-white p-4 rounded-lg max-w-xs ${msg?.fromUserId === user?._id ? 'bg-pink-500' : ''
+                            className={`p-4 rounded-2xl shadow-lg max-w-sm ${msg?.fromUserId === user?._id
+                                ? msg.filetype?.toLowerCase() === 'jpg' || msg.filetype?.toLowerCase() === 'jpeg' || msg.filetype?.toLowerCase() === 'png' || msg.filetype?.toLowerCase() === 'mp4'
+                                    ? 'bg-gray-700 text-white'
+                                    : 'bg-pink-500 text-white'
+                                : 'bg-gray-700 text-white'
                                 }`}
                         >
-                            <p>{msg.message}</p>
+                            {msg.filetype?.toLowerCase() === 'jpg' || msg.filetype?.toLowerCase() === 'jpeg' || msg.filetype?.toLowerCase() === 'png' ? (
+                                <img src={msg.message} alt="file" className="rounded-lg w-full h-auto mb-2 cursor-pointer" onClick={handleZoom} />
+                            ) : msg.filetype?.toLowerCase() === 'mp4' ? (
+                                <video src={msg.message} controls className="rounded-lg w-full h-auto mb-2" />
+                            ) : (
+                                <p className="break-words">{msg.message}</p>
+                            )}
+                            {showImageZoomModal && (
+                                <Modal image={zoomImage} alt={'image'} onClose={() => setImageZoomShowModal(false)} />)}
                         </div>
+
+                        {/* Display user profile image if message is from the current user */}
                         {msg?.fromUserId === user?._id && (
                             <img
                                 src={user?.profileimg || "default-avatar-url"}
                                 alt="User"
-                                className="rounded-full w-10 h-10 ml-3"
+                                className="rounded-full w-10 h-10 ml-3 shadow-lg"
                             />
                         )}
                     </div>
                 ))}
             </div>
+
+
             <div className="p-4 bg-gray-800 flex items-center">
                 <input
                     type="text"
@@ -129,9 +200,37 @@ function ChatMessages() {
                         }
                     }}
                     placeholder="Type a message"
-                    className="flex-1 bg-gray-700 text-white p-3 rounded-full outline-none mr-3"
+                    className="flex-1 bg-gray-700 text-white p-3 rounded-full outline-none "
                     disabled={!chatUser}
                 />
+                <Dropzone
+                    onDrop={acceptedFiles => handleDrop(acceptedFiles)}
+                    accept="image/*,video/*"
+                    disabled={!chatUser}
+                    onError={(e) => console.log(e)}
+                >
+                    {({ getRootProps, getInputProps }) => (
+                        <section>
+                            <div {...getRootProps()}>
+                                <input {...getInputProps()} name='file' disabled={!chatUser} type='file' accept="image/*,video/*" />
+                                <div className={`${chatUser ? 'cursor-pointer' : 'cursor-default'} m-4`}>
+                                    <LuUpload className="text-white" size={18} />
+                                </div>
+                            </div>
+                        </section>
+                    )}
+                </Dropzone>
+                {uploadStatus === "uploading" && (
+                    <div className="text-gray-500 flex items-center mt-2">
+                        <span className="loader mr-2"></span> Uploading...
+                    </div>
+                )}
+                {uploadStatus === "uploaded" && (
+                    <div className="text-green-500 mt-2">File uploaded successfully!</div>
+                )}
+                {uploadStatus === "error" && (
+                    <div className="text-red-500 mt-2">Error uploading file. Please try again.</div>
+                )}
                 <button onClick={handleSend} className="bg-pink-500 p-3 rounded-full" disabled={!chatUser}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
