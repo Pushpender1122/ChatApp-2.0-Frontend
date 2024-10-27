@@ -28,7 +28,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                 if (user.id) {
                     setChatUser(null);
                 }
-                window.location.reload();
+                // window.location.reload();
             }
         } catch (error) {
             console.error('Error removing friend:', error);
