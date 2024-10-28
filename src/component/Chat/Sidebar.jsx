@@ -23,6 +23,7 @@ function Sidebar({ setIsMenuOpen }) {
     const [notificationCount, setNotificationCount] = useState(0);
     const [friendRequests, setFriendRequests] = useState([]);
     const [showPopupFriendRequest, setShowPopupFriendRequest] = useState(false);
+    const [filterPublicList, setFilterPublicList] = useState([]);
     const [alertmsg, setAlertmsg] = useState({
         message: '',
         type: 'success',
@@ -54,6 +55,7 @@ function Sidebar({ setIsMenuOpen }) {
                 socket.emit('friendAccecptAck', { ReceiverId: id });
                 setUser(null);
                 setShowPopupFriendRequest(false);
+                getUser();
             }
         } catch (error) {
             console.error('Error accepting friend request:', error);
@@ -83,18 +85,19 @@ function Sidebar({ setIsMenuOpen }) {
             console.error('Error rejecting friend request:', error);
         }
     };
+    const getUser = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
+            setFilterPublicList(response.data.filter((use) => use._id !== user?._id));
+            setUsers(response.data);
+
+            // console.log("This is getAlluser", response.data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
     useEffect(() => {
         // Fetch users when the component mounts
-        const getUser = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
-                setUsers(response.data);
-
-                // console.log("This is getAlluser", response.data);
-            } catch (error) {
-                console.error("Error fetching users:", error);
-            }
-        };
         getUser();
     }, []);
     useEffect(() => {
@@ -131,13 +134,11 @@ function Sidebar({ setIsMenuOpen }) {
         socket.emit('messageStatus', { SenderID: user._id, ReceiverId: id });
         setMessageNotification(messageNotification.filter(m => m.userId !== id));
     }
-    const togglePopup = () => {
+    const togglePopup = async () => {
+        await getUser();
         setShowPopup(!showPopup);
         setSelectedUser(null);
     };
-    const filterPublicList = users.filter(user =>
-        user.username?.toLowerCase().includes(searchUserPublic.toLowerCase())
-    );
 
     const handleAddFriend = async () => {
         // alert(`${selectedUser.username} has been added as a friend!`);
@@ -221,7 +222,7 @@ function Sidebar({ setIsMenuOpen }) {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
-                console.log(response.data);
+                // getUser();
                 setFriendRequests(response.data);
             } catch (error) {
                 console.error('Error fetching friend requests:', error);
