@@ -17,6 +17,10 @@ function ChatMessages() {
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
     const [zoomImage, zoomSetImage] = useState('');
     const [uploadStatus, setUploadStatus] = useState(null);
+    const [skip, setSkip] = useState(40);
+    const [isFetching, setIsFetching] = useState(false);
+    const [isTypingMessage, setIsTypingMessage] = useState(false);
+    const total = useRef(0);
     // Automatically scroll to the bottom when messages change
     useEffect(() => {
         const scrollToBottom = () => {
@@ -27,12 +31,56 @@ function ChatMessages() {
                 });
             }
         };
-
         scrollToBottom();
-
         const timeoutId = setTimeout(scrollToBottom, 500);
         return () => clearTimeout(timeoutId);
-    }, [messages]);
+    }, [chatUser, isTypingMessage]);
+    useEffect(() => {
+        total.current = 0;
+        setMessages([]);
+        setSkip(40);
+    }, [chatUser]);
+    const handleMessageTop = async () => {
+        const fetchMessages = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/getMessage`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                    params: {
+                        SenderId: user?._id,
+                        ReceiverId: chatUser?.id,
+                        skip: skip,
+                    }, // Data sent as query parameters
+                });
+                console.log(response.data.messages);
+
+                setTimeout(() => {
+                    setMessages((prevMessages) => [...response.data.messages, ...prevMessages]);
+                    setIsFetching(false);
+                    setTimeout(() => {
+                        messageContainerRef.current.scrollTop += 1550
+                    }, 100)
+                }, 1000)
+                // setMessages((prevMessages) => [...response.data, ...prevMessages]);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        };
+        console.log(messageContainerRef.current.scrollTop);
+        if (messageContainerRef.current.scrollTop === 0 && !isFetching) {
+            console.log('fetching');
+            // messageContainerRef.current.scrollTop += 10
+            total.current > skip ? setIsFetching(true) : setIsFetching(false);
+            setTimeout(() => {
+                if (total.current > skip) {
+                    fetchMessages();
+                    setSkip(skip + 20);
+                }
+            }, 2000);
+        }
+
+    }
     const handleTyping = (e) => {
         setNewMessage(e.target.value);
         socket.emit('isTyping', { ReceiverId: chatUser?.id, SenderId: user?._id });
@@ -50,7 +98,9 @@ function ChatMessages() {
                     }, // Data sent as query parameters
                 });
                 console.log(response.data);
-                setMessages(response.data);
+                setMessages(response.data.messages);
+                total.current = response.data.total;
+                setIsFetching(false);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
@@ -98,7 +148,7 @@ function ChatMessages() {
                     senderAvatar: user?.profileimg,
                 },
             ]);
-
+            setIsTypingMessage(!isTypingMessage);
             socket.emit('private_message', { toUserId: chatUser.id, message: newMessage, SenderID: user._id });
             setNewMessage('');
         }
@@ -113,6 +163,9 @@ function ChatMessages() {
                 if (response.error) {
                     console.error(response.error);
                     setUploadStatus("error");
+                    setTimeout(() => {
+                        setUploadStatus(null);
+                    }, 2000);
                 } else {
                     const fileexe = file.name.split('.').pop();
                     console.log(fileexe);
@@ -144,8 +197,9 @@ function ChatMessages() {
     }
     return (
         <>
-            <div ref={messageContainerRef} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
-                {messages?.map((msg, index) => (
+            <div ref={messageContainerRef} onScroll={handleMessageTop} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
+
+                {!isFetching ? (messages?.map((msg, index) => (
                     <div
                         key={index}
                         className={`flex items-end mb-6 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
@@ -187,7 +241,7 @@ function ChatMessages() {
                             />
                         )}
                     </div>
-                ))}
+                ))) : <div className='text-white flex justify-center items-center'><img className='h-8 w-8' src='/loader.gif' alt='loader'></img></div>}
             </div>
 
 
@@ -208,7 +262,7 @@ function ChatMessages() {
                 />
                 <Dropzone
                     onDrop={acceptedFiles => handleDrop(acceptedFiles)}
-                    accept="image/*,video/*"
+                    // accept="image/*,video/*"
                     disabled={!chatUser}
                     onError={(e) => console.log(e)}
                 >
