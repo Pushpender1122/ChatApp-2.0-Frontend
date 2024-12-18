@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -55,6 +55,20 @@ const Login = () => {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        const getAllUser = async () => {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getalluser`);
+            if (response.status === 200) {
+                response.data.map((u) => {
+                    localStorage.removeItem(u._id);
+                })
+            }
+            localStorage.removeItem('token');
+            localStorage.removeItem('privateKey');
+            localStorage.removeItem('publicKey');
+        }
+        getAllUser();
+    }, [])
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">

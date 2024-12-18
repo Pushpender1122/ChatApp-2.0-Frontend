@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from 'react';
 import { UserContext } from "../context/user";
 import { useContext } from "react";
@@ -9,6 +9,7 @@ import { IoIosNotifications, IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import forge from 'node-forge';
 function Sidebar({ setIsMenuOpen }) {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -46,11 +47,12 @@ function Sidebar({ setIsMenuOpen }) {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-            console.log(response.data);
+            // console.log(response.data);
             if (response.status === 200) {
                 setFriendRequests((prevRequests) =>
                     prevRequests.filter((request) => request._id !== id)
                 );
+                await getTheKey(id);
                 setNotificationCount((prevCount) => prevCount - 1);
                 socket.emit('friendAccecptAck', { ReceiverId: id });
                 setUser(null);
@@ -61,7 +63,30 @@ function Sidebar({ setIsMenuOpen }) {
             console.error('Error accepting friend request:', error);
         }
     };
-
+    const getTheKey = async (id) => {
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/key`,
+                {
+                    friendId: id,
+                    publicKey: localStorage.getItem('publicKey'),
+                }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            if (response.status === 200) {
+                const decryptedAesKey = forge.pki.privateKeyFromPem(localStorage.getItem('privateKey')).decrypt(forge.util.decode64(response.data.aesKey), 'RSA-OAEP');
+                const decryptedIv = forge.pki.privateKeyFromPem(localStorage.getItem('privateKey')).decrypt(forge.util.decode64(response.data.iv), 'RSA-OAEP');
+                const obj = {
+                    aesKey: decryptedAesKey,
+                    iv: decryptedIv,
+                };
+                localStorage.setItem(id, JSON.stringify(obj));
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    }
     const handleReject = async (id) => {
         // Handle reject friend request
         console.log(`Rejected request from user with id: ${id}`);
@@ -89,6 +114,7 @@ function Sidebar({ setIsMenuOpen }) {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
             setFilterPublicList(response.data.filter((use) => use._id !== user?._id));
+            setFilterPublicList(response.data.filter((use) => !user?.friends?.includes(use._id)));
             setUsers(response.data);
 
             // console.log("This is getAlluser", response.data);
@@ -128,8 +154,12 @@ function Sidebar({ setIsMenuOpen }) {
     const filteredUsers = friends.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const handleChangeUser = (id, username, profileimg, email, description) => {
+    const filterPubUser = filterPublicList.filter(user =>
+        user.username.toLowerCase().includes(searchUserPublic.toLowerCase())
+    );
+    const handleChangeUser = async (id, username, profileimg, email, description) => {
         setIsMenuOpen(false);
+        await getTheKey(id);
         setChatUser({ id, username, profileimg, email, description });
         socket.emit('messageStatus', { SenderID: user._id, ReceiverId: id });
         setMessageNotification(messageNotification.filter(m => m.userId !== id));
@@ -187,7 +217,7 @@ function Sidebar({ setIsMenuOpen }) {
                 },
             });
             if (response.data.message === 'Friend removed successfully') {
-                // console.log('Friend removed:', response.data.message);
+
                 setAlertmsg({
                     message: response.data.message,
                     type: 'success',
@@ -199,7 +229,6 @@ function Sidebar({ setIsMenuOpen }) {
                 // console.log(selectedUser._id, user._id, chatUser.id);
                 if (selectedUser?._id === chatUser?.id) {
                     setChatUser(null);
-
                 }
                 setShowPopup(!showPopup);
                 setSelectedUser(null);
@@ -367,7 +396,7 @@ function Sidebar({ setIsMenuOpen }) {
 
                                     {/* User List */}
                                     <ul className="max-h-60 overflow-y-auto">
-                                        {filterPublicList.map((user) => (
+                                        {filterPubUser.map((user) => (
                                             <li
                                                 key={user._id}
                                                 className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
@@ -448,8 +477,6 @@ function Sidebar({ setIsMenuOpen }) {
                                     {messageNotification.some((m) => m.userId === u._id && m.status === true) && (
                                         <div className="w-2 h-2  rounded-full text-sm" style={{ backgroundColor: 'rgb(1 122 160)' }}></div>
                                     )}
-                                    {console.log("This is messageNotification", messageNotification)}
-
                                 </div>
                             ))
                         ) : (

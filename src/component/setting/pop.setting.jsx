@@ -6,7 +6,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
     //     onRemoveFriend(user._id);
     //     onClose(); // Close the popup after removing the friend
     // };
-    console.log('User:', user);
+
     const handleRemoveFriend = async () => {
 
         try {
@@ -18,7 +18,6 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                 },
             });
             if (response.data.message === 'Friend removed successfully') {
-                console.log('Friend removed:', response.data.message);
                 // if (selectedUser) {
                 socket.emit('friendRemove', { senderId: currentUser._id, ReceiverId: user.id });
                 setUser(null)

@@ -5,13 +5,10 @@ import { useContext } from 'react';
 import { IoMdSettings } from "react-icons/io";
 import { IoMdCall } from "react-icons/io";
 import { FaVideo } from "react-icons/fa";
-import { IoIosNotifications } from "react-icons/io";
 import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
-import axios from 'axios';
 import SettingPopup from '../setting/pop.setting';
 import Modal from '../utility/zoomimage';
-import VoiceCall from '../call/voiceCall';
 function ChatHeader({ setIsMenuOpen }) {
     const { chatUser, setChatUser } = useContext(ChatUserContext);
     const socket = useSocket();

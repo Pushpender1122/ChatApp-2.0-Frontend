@@ -6,6 +6,7 @@ import axios from 'axios';
 import { LuUpload } from "react-icons/lu";
 import Dropzone from 'react-dropzone'
 import Modal from '../utility/zoomimage';
+import forge from 'node-forge';
 function ChatMessages() {
     const { user } = useContext(UserContext);
     const { chatUser } = useContext(ChatUserContext);
@@ -17,6 +18,8 @@ function ChatMessages() {
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
     const [zoomImage, zoomSetImage] = useState('');
     const [uploadStatus, setUploadStatus] = useState(null);
+    const aesKey = useRef(null);
+    aesKey.current = JSON.parse(localStorage.getItem(chatUser?.id));
     // Automatically scroll to the bottom when messages change
     useEffect(() => {
         const scrollToBottom = () => {
@@ -49,8 +52,13 @@ function ChatMessages() {
                         ReceiverId: chatUser?.id,
                     }, // Data sent as query parameters
                 });
-                console.log(response.data);
-                setMessages(response.data);
+                const messages = response.data.map((msg) => ({
+                    fromUserId: msg.fromUserId,
+                    message: msg.filetype == null ? decryptMessage(msg.message, aesKey.current.aesKey, aesKey.current.iv) : msg.message,
+                    senderAvatar: msg.senderAvatar,
+                    filetype: msg.filetype,
+                }));
+                setMessages(messages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
@@ -68,12 +76,12 @@ function ChatMessages() {
             });
 
             socket.on('private_message', (data) => {
-                console.log('private_messageComing', data);
+                let message = data.fileType == null ? decryptMessage(data.message, aesKey.current.aesKey, aesKey.current.iv) : data.message;
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     {
                         fromUserId: data.fromUserId,
-                        message: data.message,
+                        message,
                         senderAvatar: data.senderAvatar,
                         filetype: data.fileType,
                     },
@@ -98,17 +106,38 @@ function ChatMessages() {
                     senderAvatar: user?.profileimg,
                 },
             ]);
-
-            socket.emit('private_message', { toUserId: chatUser.id, message: newMessage, SenderID: user._id });
+            const encMessage = encryptMessage(newMessage, aesKey.current.aesKey, aesKey.current.iv);
+            socket.emit('private_message', { toUserId: chatUser.id, message: encMessage, SenderID: user._id });
             setNewMessage('');
         }
     };
+    function encryptMessage(message, key, iv) {
+        var cipher = forge.cipher.createCipher('AES-CBC', key);
+        cipher.start({ iv: iv });
+        cipher.update(forge.util.createBuffer(message));
+        cipher.finish();
+        var encrypted = cipher.output;
+        return encrypted.toHex();
+    }
+    function decryptMessage(encrypted, key, iv) {
+        // Convert key and IV to binary
+        try {
+
+            var decipher = forge.cipher.createDecipher('AES-CBC', key);
+            decipher.start({ iv: iv });
+            decipher.update(forge.util.createBuffer(forge.util.hexToBytes(encrypted)));
+            decipher.finish();
+            var decrypted = decipher.output;
+            return decrypted.toString();
+        } catch (e) {
+            console.log(e);
+        }
+    }
     const handleDrop = async (acceptedFiles) => {
         const file = acceptedFiles[0];
         const reader = new FileReader();
         setUploadStatus("uploading");
         reader.onloadend = () => {
-
             socket.emit('upload-file', { file: reader.result, name: file.name }, (response) => {
                 if (response.error) {
                     console.error(response.error);
@@ -208,7 +237,7 @@ function ChatMessages() {
                 />
                 <Dropzone
                     onDrop={acceptedFiles => handleDrop(acceptedFiles)}
-                    accept="image/*,video/*"
+                    // accept="image/*,video/*"
                     disabled={!chatUser}
                     onError={(e) => console.log(e)}
                 >

@@ -77,11 +77,13 @@ const UserComponent = ({ user }) => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-            localStorage.removeItem('token');
-            notify();
-            setTimeout(() => {
-                navigate(`${process.env.REACT_APP_BASE_URL}/login`);
-            }, 3000);
+            if (response.status === 200) {
+                localStorage.removeItem('token');
+                notify();
+                setTimeout(() => {
+                    navigate(`${process.env.REACT_APP_BASE_URL}/login`);
+                }, 3000);
+            }
         } catch (error) {
             console.error('Error logging out user:', error);
         }
