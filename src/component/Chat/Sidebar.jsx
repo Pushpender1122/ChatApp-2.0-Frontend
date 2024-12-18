@@ -113,8 +113,9 @@ function Sidebar({ setIsMenuOpen }) {
     const getUser = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
-            setFilterPublicList(response.data.filter((use) => use._id !== user?._id));
-            setFilterPublicList(response.data.filter((use) => !user?.friends?.includes(use._id)));
+            setFilterPublicList(response.data.filter((u) => {
+                return u._id !== user?._id && !user?.friends?.includes(u._id)
+            }))
             setUsers(response.data);
 
             // console.log("This is getAlluser", response.data);
@@ -137,6 +138,7 @@ function Sidebar({ setIsMenuOpen }) {
             // console.log('FriendRemove:', data);
             setFriends(prevFriends => prevFriends.filter(f => f._id !== data.senderId));
             setChatUser(null);
+            setUser(null);
         })
     }, []);
     useEffect(() => {
