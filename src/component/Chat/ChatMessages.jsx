@@ -6,6 +6,7 @@ import axios from 'axios';
 import { LuUpload } from "react-icons/lu";
 import Dropzone from 'react-dropzone'
 import Modal from '../utility/zoomimage';
+import forge from 'node-forge';
 function ChatMessages() {
     const { user } = useContext(UserContext);
     const { chatUser } = useContext(ChatUserContext);
@@ -17,10 +18,8 @@ function ChatMessages() {
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
     const [zoomImage, zoomSetImage] = useState('');
     const [uploadStatus, setUploadStatus] = useState(null);
-    const [skip, setSkip] = useState(40);
-    const [isFetching, setIsFetching] = useState(false);
-    const [isTypingMessage, setIsTypingMessage] = useState(false);
-    const total = useRef(0);
+    const aesKey = useRef(null);
+    aesKey.current = JSON.parse(localStorage.getItem(chatUser?.id));
     // Automatically scroll to the bottom when messages change
     useEffect(() => {
         const scrollToBottom = () => {
@@ -31,56 +30,12 @@ function ChatMessages() {
                 });
             }
         };
+
         scrollToBottom();
+
         const timeoutId = setTimeout(scrollToBottom, 500);
         return () => clearTimeout(timeoutId);
-    }, [chatUser, isTypingMessage]);
-    useEffect(() => {
-        total.current = 0;
-        setMessages([]);
-        setSkip(40);
-    }, [chatUser]);
-    const handleMessageTop = async () => {
-        const fetchMessages = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/getMessage`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                    params: {
-                        SenderId: user?._id,
-                        ReceiverId: chatUser?.id,
-                        skip: skip,
-                    }, // Data sent as query parameters
-                });
-                console.log(response.data.messages);
-
-                setTimeout(() => {
-                    setMessages((prevMessages) => [...response.data.messages, ...prevMessages]);
-                    setIsFetching(false);
-                    setTimeout(() => {
-                        messageContainerRef.current.scrollTop += 1550
-                    }, 100)
-                }, 1000)
-                // setMessages((prevMessages) => [...response.data, ...prevMessages]);
-            } catch (error) {
-                console.error('Error fetching messages:', error);
-            }
-        };
-        console.log(messageContainerRef.current.scrollTop);
-        if (messageContainerRef.current.scrollTop === 0 && !isFetching) {
-            console.log('fetching');
-            // messageContainerRef.current.scrollTop += 10
-            total.current > skip ? setIsFetching(true) : setIsFetching(false);
-            setTimeout(() => {
-                if (total.current > skip) {
-                    fetchMessages();
-                    setSkip(skip + 20);
-                }
-            }, 2000);
-        }
-
-    }
+    }, [messages]);
     const handleTyping = (e) => {
         setNewMessage(e.target.value);
         socket.emit('isTyping', { ReceiverId: chatUser?.id, SenderId: user?._id });
@@ -97,10 +52,13 @@ function ChatMessages() {
                         ReceiverId: chatUser?.id,
                     }, // Data sent as query parameters
                 });
-                console.log(response.data);
-                setMessages(response.data.messages);
-                total.current = response.data.total;
-                setIsFetching(false);
+                const messages = response.data.map((msg) => ({
+                    fromUserId: msg.fromUserId,
+                    message: msg.filetype == null ? decryptMessage(msg.message, aesKey.current.aesKey, aesKey.current.iv) : msg.message,
+                    senderAvatar: msg.senderAvatar,
+                    filetype: msg.filetype,
+                }));
+                setMessages(messages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
@@ -118,12 +76,12 @@ function ChatMessages() {
             });
 
             socket.on('private_message', (data) => {
-                console.log('private_messageComing', data);
+                let message = data.fileType == null ? decryptMessage(data.message, aesKey.current.aesKey, aesKey.current.iv) : data.message;
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     {
                         fromUserId: data.fromUserId,
-                        message: data.message,
+                        message,
                         senderAvatar: data.senderAvatar,
                         filetype: data.fileType,
                     },
@@ -148,24 +106,42 @@ function ChatMessages() {
                     senderAvatar: user?.profileimg,
                 },
             ]);
-            setIsTypingMessage(!isTypingMessage);
-            socket.emit('private_message', { toUserId: chatUser.id, message: newMessage, SenderID: user._id });
+            const encMessage = encryptMessage(newMessage, aesKey.current.aesKey, aesKey.current.iv);
+            socket.emit('private_message', { toUserId: chatUser.id, message: encMessage, SenderID: user._id });
             setNewMessage('');
         }
     };
+    function encryptMessage(message, key, iv) {
+        var cipher = forge.cipher.createCipher('AES-CBC', key);
+        cipher.start({ iv: iv });
+        cipher.update(forge.util.createBuffer(message));
+        cipher.finish();
+        var encrypted = cipher.output;
+        return encrypted.toHex();
+    }
+    function decryptMessage(encrypted, key, iv) {
+        // Convert key and IV to binary
+        try {
+
+            var decipher = forge.cipher.createDecipher('AES-CBC', key);
+            decipher.start({ iv: iv });
+            decipher.update(forge.util.createBuffer(forge.util.hexToBytes(encrypted)));
+            decipher.finish();
+            var decrypted = decipher.output;
+            return decrypted.toString();
+        } catch (e) {
+            console.log(e);
+        }
+    }
     const handleDrop = async (acceptedFiles) => {
         const file = acceptedFiles[0];
         const reader = new FileReader();
         setUploadStatus("uploading");
         reader.onloadend = () => {
-
             socket.emit('upload-file', { file: reader.result, name: file.name }, (response) => {
                 if (response.error) {
                     console.error(response.error);
                     setUploadStatus("error");
-                    setTimeout(() => {
-                        setUploadStatus(null);
-                    }, 2000);
                 } else {
                     const fileexe = file.name.split('.').pop();
                     console.log(fileexe);
@@ -197,9 +173,8 @@ function ChatMessages() {
     }
     return (
         <>
-            <div ref={messageContainerRef} onScroll={handleMessageTop} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
-
-                {!isFetching ? (messages?.map((msg, index) => (
+            <div ref={messageContainerRef} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
+                {messages?.map((msg, index) => (
                     <div
                         key={index}
                         className={`flex items-end mb-6 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
@@ -241,7 +216,7 @@ function ChatMessages() {
                             />
                         )}
                     </div>
-                ))) : <div className='text-white flex justify-center items-center'><img className='h-8 w-8' src='/loader.gif' alt='loader'></img></div>}
+                ))}
             </div>
 
 

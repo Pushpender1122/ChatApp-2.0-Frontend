@@ -4,22 +4,18 @@ import ChatWindow from './ChatWindow';
 import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
 import Peer from 'peerjs';
-import { FaMicrophone, FaVideoSlash, FaPhoneSlash } from 'react-icons/fa';
 import UserFetch from '../userFetch';
+import axios from 'axios';
+import forge from 'node-forge';
 function Test() {
     const socket = useSocket();
     const { user } = useContext(UserContext);
     const peerInstance = useRef(null);
-    const [localStream, setLocalStream] = useState(null);
-    const [remoteStream, setRemoteStream] = useState(null);
     const [incomingCall, setIncomingCall] = useState(null);
     const [isCallPopupVisible, setCallPopupVisible] = useState(false);
-    const [isInCall, setIsInCall] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
     const [calluserid, setCallUserId] = useState(null);
     const [peerjsid, setPeerjsId] = useState(null);
     const [callType, setCallType] = useState(null);
-    const [isVideoHidden, setIsVideoHidden] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const username = process.env.REACT_APP_METERED_USERNAME;
     const credential = process.env.REACT_APP_METERED_PASSWORD;
@@ -35,7 +31,13 @@ function Test() {
             }
         };
     }, [user, socket]);
-
+    useEffect(() => {
+        if (!localStorage.getItem('privateKey') && !localStorage.getItem('publicKey')) {
+            const { privateKey, publicKey } = forge.pki.rsa.generateKeyPair({ bits: 2048 });
+            localStorage.setItem('privateKey', forge.pki.privateKeyToPem(privateKey));
+            localStorage.setItem('publicKey', forge.pki.publicKeyToPem(publicKey));
+        }
+    }, [])
     useEffect(() => {
         socket.on('voice_call', (data) => {
             console.log('Incoming call:', data);
@@ -91,25 +93,6 @@ function Test() {
     }, [socket]);
 
 
-    // useEffect(() => {
-    //     socket.on('end-call', () => {
-    //         removeCallTrack();
-    //         setIsInCall(false);
-    //         peerInstance.current?.disconnect();
-    //         peerInstance.current?.destroy();
-    //     });
-    // }, [localStream]);
-
-    // const getUserMedia = async () => {
-    //     try {
-    //         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: callType === 'video' ? true : false });
-    //         setLocalStream(stream);
-    //         return stream;
-    //     } catch (error) {
-    //         console.error('Error getting user media:', error);
-    //     }
-    // };
-
     const handleAcceptCall = async () => {
 
         const obj = {
@@ -122,16 +105,6 @@ function Test() {
         sessionStorage.setItem('currentCall', JSON.stringify(obj))
         window.open(`${process.env.REACT_APP_BASE_URL}/incomingCall`, '_blank');
         setCallPopupVisible(false);
-        // const stream = await getUserMedia();
-        // setCallPopupVisible(false);
-        // setIsInCall(true);
-        // peerInstance.current.on('call', (call) => {
-        //     call.answer(stream);
-        //     call.on('stream', (remoteStream) => {
-        //         setRemoteStream(remoteStream);
-        //     });
-        // });
-        // socket.emit('user-connected', { toUserId: calluserid, peerId: peerjsid, senderId: user._id });
     };
 
     const handleDeclineCall = () => {
@@ -139,37 +112,6 @@ function Test() {
         socket.emit('end-call', { toUserId: incomingCall.senderId });
     };
 
-    // const handleMute = () => {
-    //     if (localStream) {
-    //         const audioTrack = localStream.getAudioTracks()[0];
-    //         audioTrack.enabled = !audioTrack.enabled;
-    //         setIsMuted(!audioTrack.enabled);
-    //     }
-    // };
-
-    // const handleEndCall = () => {
-    //     setIsInCall(false);
-    //     if (peerInstance.current) {
-    //         peerInstance.current.disconnect();
-    //         peerInstance.current.destroy();
-    //         removeCallTrack();
-    //         socket.emit('end-call', { toUserId: incomingCall.senderId });
-    //     }
-    // };
-
-    // const removeCallTrack = () => {
-    //     if (localStream) {
-    //         localStream.getTracks().forEach(track => track.stop());
-    //         setLocalStream(null);
-    //     }
-    // };
-    // const toggleVideoHide = () => {
-    //     if (localStream) {
-    //         const newIsVideoHidden = !isVideoHidden;
-    //         localStream.getVideoTracks().forEach(track => (track.enabled = !newIsVideoHidden));
-    //         setIsVideoHidden(newIsVideoHidden);
-    //     }
-    // };
     return (
         <div className="flex bg-gray-900 h-[93vh] md:h-screen">{/* style={{ 'height': '93vh' }} */}
             <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
@@ -208,92 +150,6 @@ function Test() {
                 </div>
             )}
 
-            {/* In-Call Popup */}
-            {/* {isInCall && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row" >
-                    {callType !== 'video' && (<div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                        <h2 className="text-lg font-bold mb-4">In Call with {incomingCall?.senderName}</h2>
-                        <img
-                            src={incomingCall?.senderProfileImg}
-                            alt="Caller"
-                            className="w-20 h-20 rounded-full mx-auto mb-2"
-                        />
-                        <div className="mt-4 flex justify-center space-x-4">
-                            <button
-                                onClick={handleMute}
-                                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                {isMuted ? 'Unmute' : 'Mute'}
-                            </button>
-                            <button
-                                onClick={handleEndCall}
-                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                End Call
-                            </button>
-                        </div>
-                    </div>)}
-
-                    {callType === 'video' ? (
-                        <>
-                            <div className="relative flex flex-col items-center">
-
-                                <video
-                                    ref={(video) => video && (video.srcObject = localStream)}
-                                    autoPlay
-                                    muted
-                                    className="w-full max-w-md "
-                                    style={{ transform: 'scaleX(-1)' }}
-                                />
-                                <div className="absolute bottom-0 mb-4 flex space-x-4">
-                                    <button
-                                        onClick={handleMute}
-                                        className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'} hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
-                                    >
-                                        <FaMicrophone />
-                                    </button>
-
-                                    <button
-                                        onClick={handleEndCall}
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        <FaPhoneSlash />
-                                    </button>
-
-                                    <button
-                                        onClick={toggleVideoHide}
-                                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        <FaVideoSlash />
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-
-                    ) : (
-                        <audio
-                            ref={(audio) => audio && (audio.srcObject = localStream)}
-                            autoPlay
-                            muted
-
-                        ></audio>
-                    )}
-
-                    {callType === 'video' ? (
-                        <video
-                            ref={(video) => video && (video.srcObject = remoteStream)}
-                            autoPlay
-                            className="w-full max-w-md "
-                            style={{ transform: 'scaleX(-1)', height: '28rem' }}
-                        ></video>
-                    ) : (
-                        <audio
-                            ref={(audio) => audio && (audio.srcObject = remoteStream)}
-                            autoPlay
-                        ></audio>
-                    )}
-                </div>
-            )} */}
         </div>
     );
 }
