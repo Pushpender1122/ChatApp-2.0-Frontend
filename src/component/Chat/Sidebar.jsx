@@ -161,7 +161,9 @@ function Sidebar({ setIsMenuOpen }) {
     );
     const handleChangeUser = async (id, username, profileimg, email, description) => {
         setIsMenuOpen(false);
-        await getTheKey(id);
+        if (!localStorage.getItem(id)) {
+            await getTheKey(id);
+        }
         setChatUser({ id, username, profileimg, email, description });
         socket.emit('messageStatus', { SenderID: user._id, ReceiverId: id });
         setMessageNotification(messageNotification.filter(m => m.userId !== id));
