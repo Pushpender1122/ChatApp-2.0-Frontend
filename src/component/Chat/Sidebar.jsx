@@ -180,10 +180,12 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
     const clientSideSort = (userForFilterID) => {
         // Don't do anything if the user is already at the top
         const currentIndex = friends.findIndex(f => f._id === userForFilterID);
+        console.log("currentIndex", currentIndex);
         if (currentIndex === 0) return;
 
         // Find the user to move to top
-        const userToMove = friends.find(f => f._id === userForFilterID);
+        const userToMove = friendsRef.current.find(f => f._id === userForFilterID);
+        console.log("userToMove", userToMove);
         if (!userToMove) return;
 
         // Mark this user for animation
@@ -193,7 +195,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
         // This allows the animation to start from current position
         const updatedFriends = [
             userToMove,
-            ...friends.filter(f => f._id !== userForFilterID)
+            ...friendsRef.current.filter(f => f._id !== userForFilterID)
         ];
 
         setFriends(updatedFriends);
