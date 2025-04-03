@@ -30,7 +30,7 @@ const UserFetch = () => {
         if (user == null) {
             fetchUser();
         }
-    }, [setUser, user]);
+    }, [user]);
 
     return null;
 };

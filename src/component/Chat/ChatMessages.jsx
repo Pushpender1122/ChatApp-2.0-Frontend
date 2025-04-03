@@ -7,7 +7,7 @@ import { LuUpload } from "react-icons/lu";
 import Dropzone from 'react-dropzone'
 import Modal from '../utility/zoomimage';
 import forge from 'node-forge';
-function ChatMessages() {
+function ChatMessages({ setSendMessage }) {
     const { user } = useContext(UserContext);
     const { chatUser } = useContext(ChatUserContext);
     const [messages, setMessages] = useState([]);
@@ -109,6 +109,7 @@ function ChatMessages() {
             const encMessage = encryptMessage(newMessage, aesKey.current.aesKey, aesKey.current.iv);
             socket.emit('private_message', { toUserId: chatUser.id, message: encMessage, SenderID: user._id });
             setNewMessage('');
+            setSendMessage((prev) => !prev);
         }
     };
     function encryptMessage(message, key, iv) {

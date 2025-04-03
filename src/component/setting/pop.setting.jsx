@@ -27,6 +27,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                 if (user.id) {
                     setChatUser(null);
                 }
+                localStorage.removeItem(user.id);
                 // window.location.reload();
             }
         } catch (error) {
