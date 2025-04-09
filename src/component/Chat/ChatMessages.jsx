@@ -202,7 +202,7 @@ function ChatMessages({ setSendMessage }) {
                             ) : msg.filetype?.toLowerCase() === 'mp4' ? (
                                 <video src={msg.message} controls className="rounded-lg w-full h-auto mb-2" />
                             ) : (
-                                <p className="break-words">{msg.message}</p>
+                                <p style={{ whiteSpace: 'pre-wrap' }} className="break-words">{msg.message}</p>
                             )}
                             {showImageZoomModal && (
                                 <Modal image={zoomImage} alt={'image'} onClose={() => setImageZoomShowModal(false)} />)}
@@ -221,21 +221,29 @@ function ChatMessages({ setSendMessage }) {
             </div>
 
 
-            <div className="p-4  flex items-center">
-                <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => handleTyping(e)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault(); // Prevent default form submission
-                            handleSend();
-                        }
-                    }}
-                    placeholder="Type a message"
-                    className="flex-1 bg-gray-700 text-white p-3 rounded-full outline-none "
-                    disabled={!chatUser}
-                />
+            <div className="p-2 flex items-center ml-1 mr-1  rounded-2xl shadow-lg ">
+                <div className="flex-1 relative">
+                    <textarea
+                        value={newMessage}
+                        onChange={(e) => handleTyping(e)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleSend();
+                            }
+                        }}
+                        placeholder="Type a message"
+                        className="w-full bg-gray-700 text-white p-3 pl-4 pr-4 rounded-full outline-none resize-none overflow-y-auto scrollbar-hide min-h-[45px] max-h-[120px] h-14"
+
+                        disabled={!chatUser}
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    />
+                    <style >{`
+                        textarea::-webkit-scrollbar {
+                          display: none;
+                          }
+                   `}</style>
+                </div>
                 <Dropzone
                     onDrop={acceptedFiles => handleDrop(acceptedFiles)}
                     // accept="image/*,video/*"
@@ -246,7 +254,7 @@ function ChatMessages({ setSendMessage }) {
                         <section>
                             <div {...getRootProps()}>
                                 <input {...getInputProps()} name='file' disabled={!chatUser} type='file' accept="image/*,video/*" />
-                                <div className={`${chatUser ? 'cursor-pointer' : 'cursor-default'} m-4`}>
+                                <div className={`${chatUser ? 'cursor-styleer' : 'cursor-default'} m-4`}>
                                     <LuUpload className="text-white" size={18} />
                                 </div>
                             </div>
