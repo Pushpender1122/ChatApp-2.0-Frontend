@@ -239,7 +239,7 @@ function ChatMessages({ setSendMessage }) {
                         )}
 
                         <div
-                            className={`p-2 rounded-md shadow-lg max-w-sm ${msg?.fromUserId === user?._id
+                            className={`p-2 overflow-auto rounded-md shadow-lg max-w-sm ${msg?.fromUserId === user?._id
                                 ? msg.filetype?.toLowerCase() === 'jpg' || msg.filetype?.toLowerCase() === 'jpeg' || msg.filetype?.toLowerCase() === 'png' || msg.filetype?.toLowerCase() === 'mp4'
                                     ? 'bg-gray-700 text-white'
                                     : 'bg-pink-500 text-white'

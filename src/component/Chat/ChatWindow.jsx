@@ -8,7 +8,7 @@ import WelcomeMessage from './Welcome';
 function ChatWindow({ setIsMenuOpen, setSendMessage }) {
     const { chatUser } = useContext(ChatUserContext);
     return (
-        <div className="flex flex-1 flex-col bg-gray-900" >
+        <div className="flex flex-1 flex-col bg-gray-900 w-screen" >
             {chatUser && <ChatHeader setIsMenuOpen={setIsMenuOpen} />}
             {chatUser && <ChatMessages setSendMessage={setSendMessage} />}
             {!chatUser && <WelcomeMessage setIsMenuOpen={setIsMenuOpen} />}
