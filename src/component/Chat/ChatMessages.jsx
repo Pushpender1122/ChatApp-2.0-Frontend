@@ -7,6 +7,7 @@ import { LuUpload } from "react-icons/lu";
 import Dropzone from 'react-dropzone'
 import Modal from '../utility/zoomimage';
 import forge from 'node-forge';
+import { FaAngleDown } from "react-icons/fa6";
 function ChatMessages({ setSendMessage }) {
     const { user } = useContext(UserContext);
     const { chatUser } = useContext(ChatUserContext);
@@ -18,6 +19,12 @@ function ChatMessages({ setSendMessage }) {
     const [showImageZoomModal, setImageZoomShowModal] = useState(false);
     const [zoomImage, zoomSetImage] = useState('');
     const [uploadStatus, setUploadStatus] = useState(null);
+    const [selectedMessageIndex, setSelectedMessageIndex] = useState(null);
+    const [menuPosition, setMenuPosition] = useState('bottom');
+    const [contextMenuCoords, setContextMenuCoords] = useState(null);
+    const menuRef = useRef(null);
+    const buttonRef = useRef(null);
+    const bubbleRef = useRef(null);
     const aesKey = useRef(null);
     aesKey.current = JSON.parse(localStorage.getItem(chatUser?.id));
     // Automatically scroll to the bottom when messages change
@@ -95,6 +102,35 @@ function ChatMessages({ setSendMessage }) {
             };
         }
     }, [socket, user]);
+    useEffect(() => {
+        if (selectedMessageIndex !== null && !contextMenuCoords) {
+            const buttonRect = buttonRef.current?.getBoundingClientRect() || bubbleRef.current.getBoundingClientRect();
+            const menuHeight = menuRef.current?.offsetHeight || 100;
+            const spaceBelow = window.innerHeight - buttonRect.bottom;
+            setMenuPosition(spaceBelow < menuHeight + 40 ? 'top' : 'bottom');
+        }
+    }, [selectedMessageIndex, contextMenuCoords]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(e.target) &&
+                !bubbleRef.current.contains(e.target)
+            ) {
+                setSelectedMessageIndex(null);
+                setContextMenuCoords(null); // hide the menu if open from right click
+            }
+        };
+
+        if (selectedMessageIndex !== null) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [selectedMessageIndex]);
 
     const handleSend = () => {
         if (newMessage.trim()) {
@@ -172,6 +208,19 @@ function ChatMessages({ setSendMessage }) {
         zoomSetImage(e.target.src);
         setImageZoomShowModal(true);
     }
+    const handleRightClick = (e, msgIndex) => {
+        e.preventDefault();
+        setSelectedMessageIndex(msgIndex);
+        setContextMenuCoords({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleCopy = (msgToCopy) => {
+        navigator.clipboard.writeText(msgToCopy).then(() => {
+            console.log('Message copied to clipboard');
+        }).catch(err => {
+            console.error('Failed to copy message: ', err);
+        });
+    }
     return (
         <>
             <div ref={messageContainerRef} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
@@ -190,7 +239,7 @@ function ChatMessages({ setSendMessage }) {
                         )}
 
                         <div
-                            className={`p-4 rounded-2xl shadow-lg max-w-sm ${msg?.fromUserId === user?._id
+                            className={`p-2 rounded-md shadow-lg max-w-sm ${msg?.fromUserId === user?._id
                                 ? msg.filetype?.toLowerCase() === 'jpg' || msg.filetype?.toLowerCase() === 'jpeg' || msg.filetype?.toLowerCase() === 'png' || msg.filetype?.toLowerCase() === 'mp4'
                                     ? 'bg-gray-700 text-white'
                                     : 'bg-pink-500 text-white'
@@ -202,7 +251,59 @@ function ChatMessages({ setSendMessage }) {
                             ) : msg.filetype?.toLowerCase() === 'mp4' ? (
                                 <video src={msg.message} controls className="rounded-lg w-full h-auto mb-2" />
                             ) : (
-                                <p style={{ whiteSpace: 'pre-wrap' }} className="break-words">{msg.message}</p>
+
+                                <div
+                                    ref={bubbleRef}
+                                    onContextMenu={(e) => handleRightClick(e, index)}
+                                    className="break-words relative min-w-[40px] group"
+                                >
+                                    {/* Message text */}
+                                    <p className="whitespace-pre-wrap pr-8">{msg.message}</p>
+
+                                    {/* Icon */}
+                                    <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                        <button
+                                            ref={buttonRef}
+                                            onClick={() => {
+                                                setSelectedMessageIndex(selectedMessageIndex === index ? null : index);
+                                                setContextMenuCoords(null); // reset custom position if using icon
+                                            }}
+                                            className="text-gray-500 hover:text-gray-800 p-1"
+                                        >
+                                            <FaAngleDown size={16} />
+                                        </button>
+                                    </div>
+
+                                    {/* Action Menu */}
+                                    {selectedMessageIndex === index && (
+                                        <div
+                                            ref={menuRef}
+                                            className="absolute shadow rounded py-1 z-30 bg-gray-800 text-white transition-all"
+                                            style={
+                                                contextMenuCoords
+                                                    ? {
+                                                        position: 'fixed',
+                                                        left: contextMenuCoords.x,
+                                                        top: contextMenuCoords.y,
+                                                    }
+                                                    : {
+                                                        right: msg.fromUserId === user?._id ? '0' : 'auto',
+                                                        left: msg.fromUserId === user?._id ? 'auto' : '0',
+                                                        bottom: menuPosition === 'top' ? '100%' : 'auto',
+                                                        top: menuPosition === 'bottom' ? '100%' : 'auto',
+                                                        marginTop: menuPosition === 'bottom' ? '6px' : '0',
+                                                        marginBottom: menuPosition === 'top' ? '6px' : '0',
+                                                    }
+                                            }
+                                        >
+                                            <div className="flex flex-col">
+                                                <button className="px-3 py-1 text-left hover:bg-gray-700" onClick={() => { handleCopy(msg.message); setSelectedMessageIndex(null); setContextMenuCoords(null); }}>Copy</button>
+                                                {/* <button className="px-3 py-1 text-left hover:bg-gray-700">Edit</button> */}
+                                                {/* <button className="px-3 py-1 text-left hover:bg-gray-700">Delete</button> */}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                             {showImageZoomModal && (
                                 <Modal image={zoomImage} alt={'image'} onClose={() => setImageZoomShowModal(false)} />)}
