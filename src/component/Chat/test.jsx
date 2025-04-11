@@ -114,7 +114,7 @@ function Test() {
     };
 
     return (
-        <div className="flex bg-gray-900 h-screen md:h-screen">{/* style={{ 'height': '93vh' }} */}
+        <div className="flex bg-gray-900 h-[93vh] md:h-screen">{/* style={{ 'height': '93vh' }} */}
             <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
                 <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
             </div>

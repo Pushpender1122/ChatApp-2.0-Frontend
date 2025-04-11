@@ -375,7 +375,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
 
     return (
         <>
-            <div className="w-10/12 md:w-72 bg-gray-800 text-white flex flex-col p-4 h-screen transition-all duration-300 ease-in-out">
+            <div className="w-10/12 md:w-72 bg-gray-800 text-white flex flex-col p-4 h-full transition-all duration-300 ease-in-out">
                 {/* Profile Section */}
                 <div className="flex items-center mb-5 animate-fadeIn">
                     <img
