@@ -264,9 +264,24 @@ function ChatMessages({ setSendMessage }) {
                                     <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                                         <button
                                             ref={buttonRef}
-                                            onClick={() => {
-                                                setSelectedMessageIndex(selectedMessageIndex === index ? null : index);
-                                                setContextMenuCoords(null); // reset custom position if using icon
+                                            onClick={(e) => {
+                                                // Calculate position when clicking the icon
+                                                const rect = e.currentTarget.getBoundingClientRect();
+                                                const isOpen = selectedMessageIndex === index;
+
+                                                if (!isOpen) {
+                                                    // Calculate if we have enough space below
+                                                    const spaceBelow = window.innerHeight - rect.bottom;
+                                                    setMenuPosition(spaceBelow < 100 ? 'top' : 'bottom');
+
+                                                    // Set coords to position menu relative to button
+                                                    setContextMenuCoords({
+                                                        x: msg.fromUserId === user?._id ? rect.left - 80 : rect.right,
+                                                        y: spaceBelow < 100 ? rect.top - 10 : rect.bottom + 10
+                                                    });
+                                                }
+
+                                                setSelectedMessageIndex(isOpen ? null : index);
                                             }}
                                             className="text-gray-500 hover:text-gray-800 p-1"
                                         >
@@ -278,26 +293,24 @@ function ChatMessages({ setSendMessage }) {
                                     {selectedMessageIndex === index && (
                                         <div
                                             ref={menuRef}
-                                            className="absolute shadow rounded py-1 z-30 bg-gray-800 text-white transition-all"
-                                            style={
-                                                contextMenuCoords
-                                                    ? {
-                                                        position: 'fixed',
-                                                        left: contextMenuCoords.x,
-                                                        top: contextMenuCoords.y,
-                                                    }
-                                                    : {
-                                                        right: msg.fromUserId === user?._id ? '0' : 'auto',
-                                                        left: msg.fromUserId === user?._id ? 'auto' : '0',
-                                                        bottom: menuPosition === 'top' ? '100%' : 'auto',
-                                                        top: menuPosition === 'bottom' ? '100%' : 'auto',
-                                                        marginTop: menuPosition === 'bottom' ? '6px' : '0',
-                                                        marginBottom: menuPosition === 'top' ? '6px' : '0',
-                                                    }
-                                            }
+                                            className="fixed shadow rounded py-1 z-30 bg-gray-800 text-white"
+                                            style={{
+                                                left: contextMenuCoords ? contextMenuCoords.x : 'auto',
+                                                top: contextMenuCoords ? contextMenuCoords.y : 'auto',
+                                                minWidth: '100px'
+                                            }}
                                         >
                                             <div className="flex flex-col">
-                                                <button className="px-3 py-1 text-left hover:bg-gray-700" onClick={() => { handleCopy(msg.message); setSelectedMessageIndex(null); setContextMenuCoords(null); }}>Copy</button>
+                                                <button
+                                                    className="px-3 py-1 text-left hover:bg-gray-700"
+                                                    onClick={() => {
+                                                        handleCopy(msg.message);
+                                                        setSelectedMessageIndex(null);
+                                                        setContextMenuCoords(null);
+                                                    }}
+                                                >
+                                                    Copy
+                                                </button>
                                                 {/* <button className="px-3 py-1 text-left hover:bg-gray-700">Edit</button> */}
                                                 {/* <button className="px-3 py-1 text-left hover:bg-gray-700">Delete</button> */}
                                             </div>
