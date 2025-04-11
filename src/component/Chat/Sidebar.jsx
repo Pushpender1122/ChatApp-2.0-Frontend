@@ -121,6 +121,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
 
     const getUser = async () => {
         try {
+
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/getAllUser`);
             setFilterPublicList(response.data.filter((u) => {
                 return u._id !== user?._id && !user?.friends?.includes(u._id)
@@ -179,7 +180,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
 
     const clientSideSort = (userForFilterID) => {
         // Don't do anything if the user is already at the top
-        const currentIndex = friends.findIndex(f => f._id === userForFilterID);
+        const currentIndex = friendsRef.current.findIndex(f => f._id === userForFilterID);
         console.log("currentIndex", currentIndex);
         if (currentIndex === 0) return;
 
@@ -374,7 +375,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
 
     return (
         <>
-            <div className="w-10/12 md:w-72 bg-gray-800 text-white flex flex-col p-4 h-full transition-all duration-300 ease-in-out">
+            <div className="w-10/12 md:w-72 bg-gray-800 text-white flex flex-col p-4 h-screen transition-all duration-300 ease-in-out">
                 {/* Profile Section */}
                 <div className="flex items-center mb-5 animate-fadeIn">
                     <img
