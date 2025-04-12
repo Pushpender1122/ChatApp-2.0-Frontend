@@ -612,7 +612,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                     </div>
                 </div>
             </div>
-            <div className="z-50 w-auto md:hidden transition-opacity duration-300 hover:opacity-75" style={{ color: 'rgb(17 24 39 / var(--tw-bg-opacity))' }} onClick={() => setIsMenuOpen(false)}>div test te</div>
+            <div className="w-auto md:hidden transition-opacity duration-300 hover:opacity-75" style={{ color: 'rgb(17 24 39 / var(--tw-bg-opacity))' }} onClick={() => setIsMenuOpen(false)}>div test te</div>
             <style>{`
             @keyframes whatsapp-style-move {
                     0% { 
