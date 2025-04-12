@@ -115,14 +115,19 @@ function Test() {
 
     return (
         <div className="flex bg-gray-900 h-[93vh] md:h-screen">{/* style={{ 'height': '93vh' }} */}
-            <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
-                <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+            <div className='flex w-full h-full' >
+                <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
+                    <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                </div>
+                {/* {isMenuOpen && <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />} */}
+                <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} w-full h-[93vh] md:h-screen flex bg-gray-900`}>
+                    <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                </div>
+                <div className={`flex h-full w-full ${!isMenuOpen ? 'block' : 'hidden'}  bg-gray-900`} >
+                    <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
+                </div>
             </div>
-            {/* {isMenuOpen && <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />} */}
-            <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} w-full h-[93vh] md:h-screen flex bg-gray-900`}>
-                <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
-            </div>
-            {!isMenuOpen && <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />}
+            {/* {!isMenuOpen && <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />} */}
             <UserFetch />
             {/* Incoming Call Popup */}
             {isCallPopupVisible && (

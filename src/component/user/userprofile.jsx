@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ChatUserContext } from '../context/chatUser';
 
 const UserComponent = ({ user }) => {
     const [editMode, setEditMode] = useState(false);
     const [profileImage, setProfileImage] = useState(user?.profileimg);
     const navigate = useNavigate();
+    const { setChatUser } = useContext(ChatUserContext);
     const notify = () => toast.info("Logout Successful!", {
         autoClose: 2000,
     });
@@ -79,6 +81,7 @@ const UserComponent = ({ user }) => {
             });
             if (response.status === 200) {
                 localStorage.removeItem('token');
+                setChatUser(null);
                 notify();
                 setTimeout(() => {
                     navigate(`${process.env.REACT_APP_BASE_URL}/login`);
