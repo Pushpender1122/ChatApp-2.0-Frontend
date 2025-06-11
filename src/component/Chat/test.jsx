@@ -18,6 +18,7 @@ function Test() {
     const [callType, setCallType] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [sendMessage, setSendMessage] = useState(false);
+    const [loadingForKey, setLoadingForKey] = useState(true);
     const username = process.env.REACT_APP_METERED_USERNAME;
     const credential = process.env.REACT_APP_METERED_PASSWORD;
     useEffect(() => {
@@ -34,9 +35,23 @@ function Test() {
     }, [user, socket]);
     useEffect(() => {
         if (!localStorage.getItem('privateKey') && !localStorage.getItem('publicKey')) {
-            const { privateKey, publicKey } = forge.pki.rsa.generateKeyPair({ bits: 2048 });
-            localStorage.setItem('privateKey', forge.pki.privateKeyToPem(privateKey));
-            localStorage.setItem('publicKey', forge.pki.publicKeyToPem(publicKey));
+            // Show loading state
+            setLoadingForKey(true);
+
+            // Use setTimeout to move the heavy computation off the main thread
+            setTimeout(() => {
+                try {
+                    const { privateKey, publicKey } = forge.pki.rsa.generateKeyPair({ bits: 2048 });
+                    localStorage.setItem('privateKey', forge.pki.privateKeyToPem(privateKey));
+                    localStorage.setItem('publicKey', forge.pki.publicKeyToPem(publicKey));
+                } catch (error) {
+                    console.error("Error generating keys:", error);
+                } finally {
+                    setLoadingForKey(false);
+                }
+            }, 100);
+        } else {
+            setLoadingForKey(false); // Set loading to false if keys already exist
         }
     }, [])
     useEffect(() => {
@@ -114,50 +129,63 @@ function Test() {
     };
 
     return (
-        <div className="flex bg-gray-900 h-[93vh] md:h-screen">{/* style={{ 'height': '93vh' }} */}
-            <div className='flex w-full h-full' >
-                <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
-                    <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
-                </div>
-                {/* {isMenuOpen && <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />} */}
-                <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} w-full h-[93vh] md:h-screen flex bg-gray-900`}>
-                    <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
-                </div>
-                <div className={`flex h-full w-full ${!isMenuOpen ? 'block' : 'hidden'}  bg-gray-900`} >
-                    <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
-                </div>
-            </div>
-            {/* {!isMenuOpen && <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />} */}
-            <UserFetch />
-            {/* Incoming Call Popup */}
-            {isCallPopupVisible && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                        <h2 className="text-lg font-bold mb-4">Incoming Call</h2>
-                        <img
-                            src={incomingCall?.senderProfileImg}
-                            alt="Caller"
-                            className="w-20 h-20 rounded-full mx-auto mb-2"
-                        />
-                        <p>{incomingCall?.senderName} is calling you...</p>
-                        <div className="mt-4 flex justify-center space-x-4">
-                            <button
-                                onClick={handleAcceptCall}
-                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                Accept
-                            </button>
-                            <button
-                                onClick={handleDeclineCall}
-                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                            >
-                                Decline
-                            </button>
-                        </div>
+        <div>
+            {!loadingForKey ? (<div className="flex bg-gray-900 h-[93vh] md:h-screen">{/* style={{ 'height': '93vh' }} */}
+                <div className='flex w-full h-full' >
+                    <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
+                        <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                    </div>
+                    {/* {isMenuOpen && <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />} */}
+                    <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} w-full h-[93vh] md:h-screen flex bg-gray-900`}>
+                        <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                    </div>
+                    <div className={`flex h-full w-full ${!isMenuOpen ? 'block' : 'hidden'}  bg-gray-900`} >
+                        <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
                     </div>
                 </div>
-            )}
-
+                {/* {!isMenuOpen && <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />} */}
+                <UserFetch />
+                {/* Incoming Call Popup */}
+                {isCallPopupVisible && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                            <h2 className="text-lg font-bold mb-4">Incoming Call</h2>
+                            <img
+                                src={incomingCall?.senderProfileImg}
+                                alt="Caller"
+                                className="w-20 h-20 rounded-full mx-auto mb-2"
+                            />
+                            <p>{incomingCall?.senderName} is calling you...</p>
+                            <div className="mt-4 flex justify-center space-x-4">
+                                <button
+                                    onClick={handleAcceptCall}
+                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Accept
+                                </button>
+                                <button
+                                    onClick={handleDeclineCall}
+                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Decline
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>) :
+                (<div className="flex flex-col items-center justify-center bg-gray-900 h-[93vh] md:h-screen">
+                    <div className="p-8 rounded-lg bg-gray-800 shadow-lg text-center">
+                        <div className="mb-6">
+                            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto"></div>
+                        </div>
+                        <h2 className="text-xl font-semibold text-white mb-3">Preparing Encryption Keys</h2>
+                        <p className="text-gray-300">
+                            This may take a moment. We're generating secure keys for your messages.
+                        </p>
+                    </div>
+                </div>)
+            }
         </div>
     );
 }
