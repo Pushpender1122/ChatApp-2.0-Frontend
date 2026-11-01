@@ -3,6 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --app: 244 246 248;
+    --surface: 255 255 255;
+    --raised: 238 241 244;
+    --line: 226 230 235;
+    --ink: 15 23 42;
+    --muted: 100 116 139;
+    --brand: 13 148 136;
+    --brand-strong: 15 118 110;
+    --brand-soft: 204 244 238;
+    --on-brand: 255 255 255;
+    --danger: 225 29 72;
+    --success: 22 163 74;
+    color-scheme: light;
+}
+
+.dark {
+    --app: 9 13 17;
+    --surface: 17 24 30;
+    --raised: 27 37 46;
+    --line: 38 50 61;
+    --ink: 232 238 243;
+    --muted: 138 154 168;
+    --brand: 45 212 191;
+    --brand-strong: 94 234 212;
+    --brand-soft: 19 58 56;
+    --on-brand: 6 32 30;
+    --danger: 251 113 133;
+    --success: 74 222 128;
+    color-scheme: dark;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -14,12 +46,14 @@ html, body, #root {
 
 body {
     font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    background: #121125;
+    background: rgb(var(--app));
+    color: rgb(var(--ink));
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-button:focus-visible, input:focus-visible, textarea:focus-visible {
-    outline: 2px solid #8b7eff;
+button:focus-visible, a:focus-visible {
+    outline: 2px solid rgb(var(--brand));
     outline-offset: 2px;
 }
 
@@ -35,13 +69,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .auth-bg {
     background:
-        radial-gradient(60rem 30rem at 10% -10%, rgba(109, 93, 252, 0.35), transparent 60%),
-        radial-gradient(50rem 30rem at 100% 110%, rgba(20, 194, 154, 0.25), transparent 60%),
-        #121125;
+        radial-gradient(48rem 26rem at 0% 0%, rgb(var(--brand) / 0.16), transparent 60%),
+        radial-gradient(40rem 24rem at 100% 100%, rgb(var(--brand) / 0.10), transparent 60%),
+        rgb(var(--app));
 }
 
 .chat-bg {
-    background:
-        radial-gradient(40rem 20rem at 90% 0%, rgba(109, 93, 252, 0.12), transparent 60%),
-        #121125;
+    background-color: rgb(var(--app));
+    background-image: radial-gradient(rgb(var(--line)) 1px, transparent 1px);
+    background-size: 22px 22px;
 }
+
+.Toastify__toast { font-family: inherit; }

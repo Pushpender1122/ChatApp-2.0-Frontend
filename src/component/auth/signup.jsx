@@ -3,9 +3,11 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/theme';
 import { AuthLayout, AuthField, primaryBtn } from './AuthLayout';
 
 const Signup = () => {
+    const { theme } = useTheme();
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -57,7 +59,7 @@ const Signup = () => {
             title="Create your account"
             subtitle="Join RealTalk and start chatting in seconds."
             error={error}
-            footer={<>Already have an account? <Link to={`${process.env.REACT_APP_BASE_URL}/login`} className="text-blue-300 hover:text-blue-200 font-semibold">Log in</Link></>}
+            footer={<>Already have an account? <Link to={`${process.env.REACT_APP_BASE_URL}/login`} className="text-brand hover:text-brand-strong font-semibold">Log in</Link></>}
         >
             <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
                 <AuthField label="Username" id="username" type="text" autoComplete="username" placeholder="Your name" required value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} />
@@ -67,7 +69,7 @@ const Signup = () => {
                     {loading ? 'Creating account...' : 'Sign up'}
                 </button>
             </form>
-            <ToastContainer theme="dark" />
+            <ToastContainer theme={theme} />
         </AuthLayout>
     );
 };

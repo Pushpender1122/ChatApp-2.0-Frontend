@@ -36,12 +36,12 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
     };
     return (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">
+            <div className="bg-surface text-ink border border-line rounded-3xl shadow-2xl p-6 max-w-md w-full">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">User Details</h2>
+                    <h2 className="text-xl font-bold">Contact info</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-800 text-lg"
+                        className="text-muted hover:text-ink text-2xl leading-none"
                     >
                         &times;
                     </button>
@@ -52,14 +52,14 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                     <img
                         src={user.profileimg}
                         alt={user.username}
-                        className="rounded-full w-24 h-24 mr-6 cursor-pointer"
+                        className="rounded-full w-24 h-24 object-cover mr-6 cursor-pointer"
                         onClick={() => setImageZoomShowModal(true)}
                     />
                     <div>
                         {/* User Details */}
-                        <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
-                        <p className="text-gray-600">Email : {user.email}</p>
-                        <p className="text-gray-600">Bio : {user.description}</p>
+                        <h3 className="text-xl font-semibold">{user.username}</h3>
+                        <p className="text-muted">Email : {user.email}</p>
+                        <p className="text-muted">Bio : {user.description}</p>
                     </div>
                 </div>
 
@@ -67,7 +67,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                     {/* Remove Friend Button */}
                     <button
                         onClick={handleRemoveFriend}
-                        className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-full"
+                        className="bg-danger/10 hover:bg-danger/20 text-danger font-semibold py-2 px-5 rounded-full"
                     >
                         Remove Friend
                     </button>

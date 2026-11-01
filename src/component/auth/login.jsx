@@ -4,10 +4,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/user';
+import { useTheme } from '../context/theme';
 import { AuthLayout, AuthField, primaryBtn, secondaryBtn } from './AuthLayout';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { theme } = useTheme();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -78,7 +80,7 @@ const Login = () => {
             title="Welcome back"
             subtitle="Log in to pick up your conversations."
             error={error}
-            footer={<>New here? <Link to={`${process.env.REACT_APP_BASE_URL}/signup`} className="text-blue-300 hover:text-blue-200 font-semibold">Create an account</Link></>}
+            footer={<>New here? <Link to={`${process.env.REACT_APP_BASE_URL}/signup`} className="text-brand hover:text-brand-strong font-semibold">Create an account</Link></>}
         >
             <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
                 <AuthField
@@ -104,8 +106,8 @@ const Login = () => {
                 <button type="submit" className={primaryBtn} disabled={loading}>
                     {loading && !templogin ? 'Logging in...' : 'Log in'}
                 </button>
-                <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span className="flex-1 h-px bg-white/10" />or<span className="flex-1 h-px bg-white/10" />
+                <div className="flex items-center gap-3 text-xs text-muted">
+                    <span className="flex-1 h-px bg-line" />or<span className="flex-1 h-px bg-line" />
                 </div>
                 <button
                     type="submit"
@@ -116,7 +118,7 @@ const Login = () => {
                     {loading && templogin ? 'Logging in...' : 'Continue as guest'}
                 </button>
             </form>
-            <ToastContainer theme="dark" />
+            <ToastContainer theme={theme} />
         </AuthLayout>
     );
 };
