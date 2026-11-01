@@ -35,8 +35,8 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
         }
     };
     return (
-        <div className="fixed inset-1 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-gray-800">User Details</h2>
                     <button
@@ -67,7 +67,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
                     {/* Remove Friend Button */}
                     <button
                         onClick={handleRemoveFriend}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-full"
                     >
                         Remove Friend
                     </button>

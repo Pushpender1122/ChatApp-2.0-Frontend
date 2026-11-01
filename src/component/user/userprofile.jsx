@@ -93,14 +93,14 @@ const UserComponent = ({ user }) => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-dark-blue-900 text-white px-4 md:px-8">
-            <div className="w-full md:w-3/4 p-8 bg-black shadow-lg" style={{ 'height': '100vh', 'width': '100vw' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center auth-bg text-white px-4 md:px-8">
+            <div className="w-full max-w-4xl p-6 md:p-10 my-6 bg-gray-800/70 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-light-blue-500">User Profile</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-blue-400">User Profile</h1>
                     {!editMode && (
                         <button
                             onClick={() => setEditMode(true)}
-                            className="bg-light-blue-500 hover:bg-light-blue-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-500 hover:bg-blue-400 text-white font-semibold py-2 px-5 rounded-full"
                         >
                             Edit Profile
                         </button>
@@ -108,13 +108,13 @@ const UserComponent = ({ user }) => {
                     <div className="flex space-x-2">
                         <button
                             onClick={() => navigate(`/`)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-500 hover:bg-blue-400 text-white font-semibold py-2 px-5 rounded-full"
                         >
                             Chat
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-full"
                         >
                             Logout
                         </button>
@@ -140,37 +140,37 @@ const UserComponent = ({ user }) => {
                     </div>
                     <div className="flex-grow space-y-6">
                         <div>
-                            <label className="block text-light-blue-500 font-semibold">Username</label>
+                            <label className="block text-blue-400 font-semibold">Username</label>
                             <input
                                 type="text"
                                 name="username"
                                 value={userData?.username}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
-                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
+                                className={`w-full p-3 rounded-xl bg-gray-900/70 text-white ${editMode ? 'border-2 border-blue-400' : 'border-none'
                                     }`}
                             />
                         </div>
                         <div>
-                            <label className="block text-light-blue-500 font-semibold">Email</label>
+                            <label className="block text-blue-400 font-semibold">Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={userData?.email}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
-                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
+                                className={`w-full p-3 rounded-xl bg-gray-900/70 text-white ${editMode ? 'border-2 border-blue-400' : 'border-none'
                                     }`}
                             />
                         </div>
                         <div>
-                            <label className="block text-light-blue-500 font-semibold">Description</label>
+                            <label className="block text-blue-400 font-semibold">Description</label>
                             <textarea
                                 name="description"
                                 value={userData?.description}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
-                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
+                                className={`w-full p-3 rounded-xl bg-gray-900/70 text-white ${editMode ? 'border-2 border-blue-400' : 'border-none'
                                     }`}
                                 rows="6"
                             ></textarea>
@@ -181,13 +181,13 @@ const UserComponent = ({ user }) => {
                     <div className="mt-8 flex justify-end space-x-4">
                         <button
                             onClick={() => setEditMode(false)}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-full"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSave}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-500 hover:bg-blue-400 text-white font-semibold py-2 px-5 rounded-full"
                         >
                             Save Changes
                         </button>

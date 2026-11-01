@@ -37,7 +37,11 @@ function App() {
           <Route exact path={process.env.REACT_APP_BASE_URL + "/signup"} element={<Signup />} />
           <Route exact path={process.env.REACT_APP_BASE_URL + "/login"} element={<Login />} />
         </Route>
-        <Route path="*" element={<p>There's nothing here: 404!</p>} />
+        <Route path="*" element={<div className="auth-bg min-h-screen flex flex-col items-center justify-center text-center text-white px-4">
+          <h1 className="text-7xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">404</h1>
+          <p className="text-gray-400 mt-3 mb-6">There's nothing here.</p>
+          <a href="/" className="bg-blue-500 hover:bg-blue-400 px-6 py-2.5 rounded-full font-semibold">Back to chats</a>
+        </div>} />
       </Routes>
     </BrowserRouter>
   );

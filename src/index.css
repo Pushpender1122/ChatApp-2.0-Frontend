@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,19 +6,42 @@
 * {
     margin: 0;
     padding: 0;
-
 }
 
-/* For WebKit browsers (Chrome, Safari, etc.) */
+html, body, #root {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #121125;
+    -webkit-font-smoothing: antialiased;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid #8b7eff;
+    outline-offset: 2px;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
     width: 0;
     height: 0;
 }
 
-/* For Firefox */
 .hide-scrollbar {
     scrollbar-width: none;
-    /* hide scrollbar */
     -ms-overflow-style: none;
-    /* hide scrollbar in IE 10+ */
+}
+
+.auth-bg {
+    background:
+        radial-gradient(60rem 30rem at 10% -10%, rgba(109, 93, 252, 0.35), transparent 60%),
+        radial-gradient(50rem 30rem at 100% 110%, rgba(20, 194, 154, 0.25), transparent 60%),
+        #121125;
+}
+
+.chat-bg {
+    background:
+        radial-gradient(40rem 20rem at 90% 0%, rgba(109, 93, 252, 0.12), transparent 60%),
+        #121125;
 }

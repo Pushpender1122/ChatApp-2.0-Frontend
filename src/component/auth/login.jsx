@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/user';
+import { AuthLayout, AuthField, primaryBtn, secondaryBtn } from './AuthLayout';
+
 const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -33,14 +35,11 @@ const Login = () => {
                 password,
             });
 
-            console.log('Login successful:', response.data);
             const { token } = response.data;
 
             // Save JWT token in localStorage
             localStorage.setItem('token', token);
-            //   onLogin(token);
             notify()
-            console.log(response.data);
 
             setEmail('');
             setPassword('');
@@ -53,15 +52,20 @@ const Login = () => {
             setError(err.response?.data?.message || 'Invalid email or password.');
         } finally {
             setLoading(false);
+            setTemplogin(false);
         }
     };
     useEffect(() => {
         const getAllUser = async () => {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getalluser`);
-            if (response.status === 200) {
-                response.data.map((u) => {
-                    localStorage.removeItem(u._id);
-                })
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/getalluser`);
+                if (response.status === 200) {
+                    response.data.forEach((u) => {
+                        localStorage.removeItem(u._id);
+                    })
+                }
+            } catch (err) {
+                console.error('Error clearing keys:', err);
             }
             localStorage.removeItem('token');
             localStorage.removeItem('privateKey');
@@ -70,60 +74,50 @@ const Login = () => {
         getAllUser();
     }, [])
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold text-center text-gray-800">Log In</h2>
-                {error && <div className="text-red-500 text-sm mt-2 text-center">{error}</div>}
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div>
-                        <label className="block text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            disabled={loading}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            disabled={loading}
-                        />
-                    </div>
-                    <div>
-                        <button
-                            type="submit"
-                            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={loading}
-                            onClick={() => setTemplogin(true)}
-                        >
-                            {loading ? 'Logging in...' : 'Login as a Guest'}
-                        </button>
-                        <button
-                            type="submit"
-                            className={`mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={loading}
-
-                        >
-                            {loading ? 'Logging in...' : 'Log In'}
-                        </button>
-                        <button
-                            onClick={() => navigate(`${process.env.REACT_APP_BASE_URL}/signup`)}
-                            className="mt-4 w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                        >
-                            Sign Up
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <ToastContainer />
-        </div>
+        <AuthLayout
+            title="Welcome back"
+            subtitle="Log in to pick up your conversations."
+            error={error}
+            footer={<>New here? <Link to={`${process.env.REACT_APP_BASE_URL}/signup`} className="text-blue-300 hover:text-blue-200 font-semibold">Create an account</Link></>}
+        >
+            <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+                <AuthField
+                    label="Email"
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                />
+                <AuthField
+                    label="Password"
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                />
+                <button type="submit" className={primaryBtn} disabled={loading}>
+                    {loading && !templogin ? 'Logging in...' : 'Log in'}
+                </button>
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <span className="flex-1 h-px bg-white/10" />or<span className="flex-1 h-px bg-white/10" />
+                </div>
+                <button
+                    type="submit"
+                    className={secondaryBtn}
+                    disabled={loading}
+                    onClick={() => setTemplogin(true)}
+                >
+                    {loading && templogin ? 'Logging in...' : 'Continue as guest'}
+                </button>
+            </form>
+            <ToastContainer theme="dark" />
+        </AuthLayout>
     );
 };
 

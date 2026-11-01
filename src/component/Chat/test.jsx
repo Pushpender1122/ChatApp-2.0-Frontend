@@ -147,25 +147,25 @@ function Test() {
                 <UserFetch />
                 {/* Incoming Call Popup */}
                 {isCallPopupVisible && (
-                    <div className="fixed inset-0 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm">
+                        <div className="bg-gray-800 text-white border border-white/10 p-8 rounded-3xl shadow-2xl text-center w-80">
                             <h2 className="text-lg font-bold mb-4">Incoming Call</h2>
                             <img
                                 src={incomingCall?.senderProfileImg}
                                 alt="Caller"
-                                className="w-20 h-20 rounded-full mx-auto mb-2"
+                                className="w-24 h-24 rounded-full object-cover mx-auto mb-3 ring-4 ring-blue-500/50"
                             />
                             <p>{incomingCall?.senderName} is calling you...</p>
                             <div className="mt-4 flex justify-center space-x-4">
                                 <button
                                     onClick={handleAcceptCall}
-                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 px-6 rounded-full"
                                 >
                                     Accept
                                 </button>
                                 <button
                                     onClick={handleDeclineCall}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-6 rounded-full"
                                 >
                                     Decline
                                 </button>

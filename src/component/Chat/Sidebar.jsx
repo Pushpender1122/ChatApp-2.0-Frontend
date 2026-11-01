@@ -375,7 +375,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
 
     return (
         <>
-            <div className="w-10/12 md:w-72 bg-gray-800 text-white flex flex-col p-4 h-full transition-all duration-300 ease-in-out">
+            <div className="w-full md:w-80 bg-gray-800 text-white flex flex-col p-4 border-r border-white/5 h-full transition-all duration-300 ease-in-out">
                 {/* Profile Section */}
                 <div className="flex items-center mb-5 animate-fadeIn">
                     <img
@@ -384,7 +384,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                         className="rounded-full w-12 h-12 mr-3 hover:scale-110 transition-transform duration-200"
                     />
                     <div className="flex-1">
-                        <h2 className="font-semibold text-lg">{user?.username}</h2>
+                        <h2 className="font-semibold text-lg truncate">{user?.username}</h2>
                         <span className="text-sm text-gray-400">Active Now</span>
                     </div>
                     <Link to={`${process.env.REACT_APP_BASE_URL}/profile`}>
@@ -555,7 +555,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                         placeholder="Search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-gray-700 text-white p-2 rounded-lg outline-none"
+                        className="w-full bg-gray-700 text-white placeholder-gray-400 px-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/50"
                     />
                 </div>
 
@@ -573,10 +573,10 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                                 return (
                                     <div
                                         key={u._id}
-                                        className={`flex items-center p-2 rounded-lg cursor-pointer transition-all duration-300
+                                        className={`flex items-center p-2.5 rounded-xl cursor-pointer transition-all duration-300
                                             ${isActiveChatUser
-                                                ? 'bg-gradient-to-r from-indigo-600 to-grey-600 shadow-md'
-                                                : 'bg-gray-700 hover:bg-gray-600'}
+                                                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md'
+                                                : 'bg-transparent hover:bg-gray-700'}
                                             ${isBeingAnimated ? 'animate-whatsapp-style-move' : ''}`}
                                         onClick={() => handleChangeUser(u._id, u.username, u.profileimg, u.email, u.description)}
                                     >
@@ -584,7 +584,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                                             <img
                                                 src={u.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
                                                 alt={u.username}
-                                                className={`rounded-full w-10 h-10 mr-3 ${isBeingAnimated ? 'animate-brief-pulse' : ''}`}
+                                                className={`rounded-full w-11 h-11 object-cover mr-3 ${isBeingAnimated ? 'animate-brief-pulse' : ''}`}
                                             />
                                             {/* {isActiveChatUser && (
                                                 <span className="absolute bottom-0 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></span>
@@ -612,7 +612,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                     </div>
                 </div>
             </div>
-            <div className="w-auto md:hidden transition-opacity duration-300 hover:opacity-75" style={{ color: 'rgb(17 24 39 / var(--tw-bg-opacity))' }} onClick={() => setIsMenuOpen(false)}>div test te</div>
+            <div className="hidden"></div>
             <style>{`
             @keyframes whatsapp-style-move {
                     0% { 
