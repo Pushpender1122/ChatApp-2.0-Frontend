@@ -1,30 +1,39 @@
 import React from 'react';
-import { IoMenu } from 'react-icons/io5';
+import { IoMenu, IoChatbubbleEllipses, IoLockClosed, IoImages, IoCall } from 'react-icons/io5';
+
+const features = [
+    { icon: IoLockClosed, text: 'End-to-end encrypted' },
+    { icon: IoImages, text: 'Photos & videos' },
+    { icon: IoCall, text: 'Voice & video calls' },
+];
 
 function WelcomeMessage({ setIsMenuOpen }) {
     return (
-        <>
-            <div className='block md:hidden cursor-pointer text-white p-10' style={{ 'marginRight': '1rem' }} onClick={() => {
-                setIsMenuOpen(true);
-            }}>
+        <div className="chat-bg flex flex-col flex-1 h-full">
+            <button
+                aria-label="Open chats"
+                className="md:hidden self-start m-4 p-2.5 rounded-xl bg-surface border border-line text-ink"
+                onClick={() => setIsMenuOpen(true)}
+            >
                 <IoMenu size={20} />
+            </button>
+            <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
+                <span className="w-20 h-20 rounded-3xl bg-brand text-on-brand flex items-center justify-center mb-6">
+                    <IoChatbubbleEllipses size={38} />
+                </span>
+                <h1 className="text-3xl font-bold text-ink mb-3">Welcome to RealTalk</h1>
+                <p className="text-muted max-w-md mb-8">
+                    Pick a conversation from the list, or add a friend to start chatting.
+                </p>
+                <div className="flex flex-wrap justify-center gap-3">
+                    {features.map(({ icon: Icon, text }) => (
+                        <span key={text} className="flex items-center gap-2 text-sm text-ink bg-surface border border-line rounded-full px-4 py-2">
+                            <Icon className="text-brand" /> {text}
+                        </span>
+                    ))}
+                </div>
             </div>
-            <div className="flex flex-col items-center justify-center h-full text-center text-slate-50 p-8">
-
-                <h1 className="text-2xl font-semibold text-white mb-4">
-                    Welcome to RealTalk!
-                </h1>
-                <p className="text-lg mb-2">
-                    RealTalk lets you connect with friends and family through instant messaging, video calls, and more.
-                </p>
-                <p className="text-lg mb-2">
-                    You can share photos, videos seamlessly.
-                </p>
-                <p className="text-lg">
-                    Start a conversation now and experience real-time communication.
-                </p>
-            </div>
-        </>
+        </div>
     );
 }
 

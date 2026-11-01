@@ -1,23 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --app: 244 246 248;
+    --surface: 255 255 255;
+    --raised: 238 241 244;
+    --line: 226 230 235;
+    --ink: 15 23 42;
+    --muted: 100 116 139;
+    --brand: 13 148 136;
+    --brand-strong: 15 118 110;
+    --brand-soft: 204 244 238;
+    --on-brand: 255 255 255;
+    --danger: 225 29 72;
+    --success: 22 163 74;
+    color-scheme: light;
+}
+
+.dark {
+    --app: 9 13 17;
+    --surface: 17 24 30;
+    --raised: 27 37 46;
+    --line: 38 50 61;
+    --ink: 232 238 243;
+    --muted: 138 154 168;
+    --brand: 45 212 191;
+    --brand-strong: 94 234 212;
+    --brand-soft: 19 58 56;
+    --on-brand: 6 32 30;
+    --danger: 251 113 133;
+    --success: 74 222 128;
+    color-scheme: dark;
+}
+
 * {
     margin: 0;
     padding: 0;
-
 }
 
-/* For WebKit browsers (Chrome, Safari, etc.) */
+html, body, #root {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: rgb(var(--app));
+    color: rgb(var(--ink));
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+button:focus-visible, a:focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
     width: 0;
     height: 0;
 }
 
-/* For Firefox */
 .hide-scrollbar {
     scrollbar-width: none;
-    /* hide scrollbar */
     -ms-overflow-style: none;
-    /* hide scrollbar in IE 10+ */
 }
+
+.auth-bg {
+    background:
+        radial-gradient(48rem 26rem at 0% 0%, rgb(var(--brand) / 0.16), transparent 60%),
+        radial-gradient(40rem 24rem at 100% 100%, rgb(var(--brand) / 0.10), transparent 60%),
+        rgb(var(--app));
+}
+
+.chat-bg {
+    background-color: rgb(var(--app));
+    background-image: radial-gradient(rgb(var(--line)) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+.Toastify__toast { font-family: inherit; }

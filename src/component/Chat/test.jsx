@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useRef, useState } from 'react';
 import Sidebar from './Sidebar';
+import NavRail from './NavRail';
 import ChatWindow from './ChatWindow';
 import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
@@ -129,63 +130,64 @@ function Test() {
     };
 
     return (
-        <div>
-            {!loadingForKey ? (<div className="flex bg-gray-900 h-[93vh] md:h-screen">{/* style={{ 'height': '93vh' }} */}
-                <div className='flex w-full h-full' >
-                    <div className="hidden md:block"> {/* Hidden on small screens, visible on medium and above */}
-                        <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+        <div className="h-[100dvh] bg-app text-ink">
+            {!loadingForKey ? (
+                <div className="flex h-full">
+                    <div className="hidden md:flex">
+                        <NavRail />
                     </div>
-                    {/* {isMenuOpen && <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />} */}
-                    <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} w-full h-[93vh] md:h-screen flex bg-gray-900`}>
-                        <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                    <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex w-full md:w-auto flex-col h-full`}>
+                        <div className="flex-1 min-h-0">
+                            <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                        </div>
+                        <div className="md:hidden">
+                            <NavRail horizontal />
+                        </div>
                     </div>
-                    <div className={`flex h-full w-full ${!isMenuOpen ? 'block' : 'hidden'}  bg-gray-900`} >
+                    <div className={`${!isMenuOpen ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 h-full`}>
                         <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
                     </div>
-                </div>
-                {/* {!isMenuOpen && <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />} */}
-                <UserFetch />
-                {/* Incoming Call Popup */}
-                {isCallPopupVisible && (
-                    <div className="fixed inset-0 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                            <h2 className="text-lg font-bold mb-4">Incoming Call</h2>
-                            <img
-                                src={incomingCall?.senderProfileImg}
-                                alt="Caller"
-                                className="w-20 h-20 rounded-full mx-auto mb-2"
-                            />
-                            <p>{incomingCall?.senderName} is calling you...</p>
-                            <div className="mt-4 flex justify-center space-x-4">
-                                <button
-                                    onClick={handleAcceptCall}
-                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                >
-                                    Accept
-                                </button>
-                                <button
-                                    onClick={handleDeclineCall}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                >
-                                    Decline
-                                </button>
+                    <UserFetch />
+                    {isCallPopupVisible && (
+                        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm p-4">
+                            <div className="bg-surface text-ink border border-line p-8 rounded-3xl shadow-2xl text-center w-full max-w-xs">
+                                <p className="text-sm text-muted mb-4">Incoming call</p>
+                                <img
+                                    src={incomingCall?.senderProfileImg}
+                                    alt="Caller"
+                                    className="w-24 h-24 rounded-full object-cover mx-auto mb-3 ring-4 ring-brand/30"
+                                />
+                                <h2 className="text-lg font-semibold">{incomingCall?.senderName}</h2>
+                                <p className="text-sm text-muted">is calling you...</p>
+                                <div className="mt-6 flex justify-center gap-4">
+                                    <button
+                                        onClick={handleDeclineCall}
+                                        className="bg-danger text-white font-semibold py-2.5 px-6 rounded-full hover:opacity-90"
+                                    >
+                                        Decline
+                                    </button>
+                                    <button
+                                        onClick={handleAcceptCall}
+                                        className="bg-success text-white font-semibold py-2.5 px-6 rounded-full hover:opacity-90"
+                                    >
+                                        Accept
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>) :
-                (<div className="flex flex-col items-center justify-center bg-gray-900 h-[93vh] md:h-screen">
-                    <div className="p-8 rounded-lg bg-gray-800 shadow-lg text-center">
-                        <div className="mb-6">
-                            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto"></div>
-                        </div>
-                        <h2 className="text-xl font-semibold text-white mb-3">Preparing Encryption Keys</h2>
-                        <p className="text-gray-300">
+                    )}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center h-full">
+                    <div className="p-8 rounded-3xl bg-surface border border-line shadow-lg text-center max-w-sm">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-line border-t-brand mx-auto mb-5"></div>
+                        <h2 className="text-lg font-semibold mb-2">Preparing encryption keys</h2>
+                        <p className="text-muted text-sm">
                             This may take a moment. We're generating secure keys for your messages.
                         </p>
                     </div>
-                </div>)
-            }
+                </div>
+            )}
         </div>
     );
 }

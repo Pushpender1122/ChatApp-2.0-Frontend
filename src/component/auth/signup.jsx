@@ -2,23 +2,26 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/theme';
+import { AuthLayout, AuthField, primaryBtn } from './AuthLayout';
+
 const Signup = () => {
+    const { theme } = useTheme();
     const [username, setUsername] = useState('');
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const notify = () => toast.success("Registered Successful!", {
+    const notify = () => toast.success("Registered Successfully!", {
         autoClose: 2000,
     });
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(''); // Reset error state before submission
-        setLoading(true); // Show loading state
+        setError('');
+        setLoading(true);
 
-        // Basic validation
         if (!username || !email || !password) {
             setError('All fields are required');
             setLoading(false);
@@ -26,24 +29,19 @@ const Signup = () => {
         }
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/registeruser`, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/registeruser`, {
                 username,
                 email,
                 password,
             });
 
-            console.log('Signup successful:', response.data);
-            // onSignup(response.data); // Call parent function with response data
-            console.log(response.data);
-            // Clear form fields after successful submission
-            alert("User Registered Successfully");
             notify()
             setUsername('');
             setEmail('');
             setPassword('');
             setTimeout(() => {
                 navigate(`${process.env.REACT_APP_BASE_URL}/login`);
-            }, 3000);
+            }, 2000);
         } catch (err) {
             console.error('Error during signup:', err);
             if (err.response && err.response.data) {
@@ -57,63 +55,22 @@ const Signup = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold text-center text-gray-800">Sign Up</h2>
-                {error && <div className="text-red-500 text-sm mt-2 text-center">{error}</div>}
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div>
-                        <label className="block text-gray-700">Username</label>
-                        <input
-                            type="text"
-                            required
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            disabled={loading}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            disabled={loading}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Password</label>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            disabled={loading}
-                        />
-                    </div>
-                    <div>
-                        <button
-                            type="submit"
-                            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={loading}
-                        >
-                            {loading ? 'Signing up...' : 'Sign Up'}
-                        </button>
-                        <button
-                            onClick={() => navigate(`${process.env.REACT_APP_BASE_URL}/login`)}
-                            className="mt-4 w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
-                        >
-                            Log In
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <ToastContainer />
-        </div>
+        <AuthLayout
+            title="Create your account"
+            subtitle="Join RealTalk and start chatting in seconds."
+            error={error}
+            footer={<>Already have an account? <Link to={`${process.env.REACT_APP_BASE_URL}/login`} className="text-brand hover:text-brand-strong font-semibold">Log in</Link></>}
+        >
+            <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+                <AuthField label="Username" id="username" type="text" autoComplete="username" placeholder="Your name" required value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} />
+                <AuthField label="Email" id="email" type="email" autoComplete="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
+                <AuthField label="Password" id="password" type="password" autoComplete="new-password" placeholder="Create a password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
+                <button type="submit" className={primaryBtn} disabled={loading}>
+                    {loading ? 'Creating account...' : 'Sign up'}
+                </button>
+            </form>
+            <ToastContainer theme={theme} />
+        </AuthLayout>
     );
 };
 

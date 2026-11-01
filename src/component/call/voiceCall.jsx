@@ -155,7 +155,7 @@ const VoiceCall = () => {
         <div >
             {/* <h1>{value === 'video' ? 'Video Call' : 'Voice Call'}</h1> */}
             {showCallPopup && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row" style={{ background: 'black' }}>
+                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row bg-app text-ink" >
                     {localStream && value === 'video' && (
                         <div className="relative flex flex-col items-center">
                             {isVideoHidden ? (
@@ -177,21 +177,21 @@ const VoiceCall = () => {
                             <div className="absolute bottom-0 mb-4 flex space-x-4">
                                 <button
                                     onClick={toggleMute}
-                                    className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'} hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+                                    className={`${isMuted ? 'bg-raised text-ink' : 'bg-brand text-on-brand'} hover:opacity-90 font-semibold py-2.5 px-5 rounded-full`}
                                 >
                                     <FaMicrophone />
                                 </button>
 
                                 <button
                                     onClick={handleCallDisconnect}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                    className="bg-danger hover:opacity-90 text-white font-semibold py-2.5 px-5 rounded-full"
                                 >
                                     <FaPhoneSlash />
                                 </button>
 
                                 <button
                                     onClick={toggleVideoHide}
-                                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                                    className="bg-raised text-ink hover:opacity-90 font-semibold py-2.5 px-5 rounded-full"
                                 >
                                     <FaVideoSlash />
                                 </button>
@@ -209,11 +209,11 @@ const VoiceCall = () => {
                     )}
 
                     {value !== 'video' && (
-                        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+                        <div className="bg-surface text-ink border border-line p-8 rounded-3xl shadow-2xl flex flex-col items-center">
                             <img
                                 src={chatUser?.profileimg || "https://via.placeholder.com/150"}
                                 alt="User Avatar"
-                                className="rounded-full w-24 h-24 mb-4"
+                                className="rounded-full w-24 h-24 object-cover ring-4 ring-brand/30 mb-4"
                             />
                             <h2 className="text-lg font-bold mb-4">Calling {chatUser?.username}...</h2>
 
@@ -222,14 +222,14 @@ const VoiceCall = () => {
                             <div className="flex space-x-4 mt-4">
                                 <button
                                     onClick={toggleMute}
-                                    className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'} hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
+                                    className={`${isMuted ? 'bg-raised text-ink' : 'bg-brand text-on-brand'} hover:opacity-90 font-semibold py-2.5 px-5 rounded-full`}
                                 >
                                     {isMuted ? 'Unmute' : 'Mute'}
                                 </button>
 
                                 <button
                                     onClick={handleCallDisconnect}
-                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                    className="bg-danger hover:opacity-90 text-white font-semibold py-2.5 px-5 rounded-full"
                                 >
                                     End Call
                                 </button>

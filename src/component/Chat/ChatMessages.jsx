@@ -223,27 +223,27 @@ function ChatMessages({ setSendMessage }) {
     }
     return (
         <>
-            <div ref={messageContainerRef} className="flex-1 p-5 overflow-y-auto bg-gray-900 hide-scrollbar">
+            <div ref={messageContainerRef} className="flex-1 min-h-0 px-4 md:px-8 py-6 overflow-y-auto chat-bg hide-scrollbar">
                 {messages?.map((msg, index) => (
                     <div
                         key={index}
-                        className={`flex items-end mb-6 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
+                        className={`flex items-end mb-4 ${msg.fromUserId === user?._id ? 'justify-end' : ''}`}
                     >
                         {/* Display profile image if message is from another user */}
                         {msg?.fromUserId !== user?._id && (
                             <img
                                 src={chatUser?.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
                                 alt="Sender"
-                                className="rounded-full w-10 h-10 mr-3 shadow-lg"
+                                className="rounded-full w-8 h-8 object-cover mr-2"
                             />
                         )}
 
                         <div
-                            className={`p-2 overflow-auto rounded-md shadow-lg max-w-sm ${msg?.fromUserId === user?._id
+                            className={`px-4 py-2.5 overflow-auto shadow-sm max-w-[80%] sm:max-w-md ${msg?.fromUserId === user?._id
                                 ? msg.filetype?.toLowerCase() === 'jpg' || msg.filetype?.toLowerCase() === 'jpeg' || msg.filetype?.toLowerCase() === 'png' || msg.filetype?.toLowerCase() === 'mp4'
-                                    ? 'bg-gray-700 text-white'
-                                    : 'bg-pink-500 text-white'
-                                : 'bg-gray-700 text-white'
+                                    ? 'bg-surface text-ink border border-line rounded-2xl rounded-br-md'
+                                    : 'bg-brand text-on-brand rounded-2xl rounded-br-md'
+                                : 'bg-surface text-ink border border-line rounded-2xl rounded-bl-md'
                                 }`}
                         >
                             {msg.filetype?.toLowerCase() === 'jpg' || msg.filetype?.toLowerCase() === 'jpeg' || msg.filetype?.toLowerCase() === 'png' ? (
@@ -283,7 +283,7 @@ function ChatMessages({ setSendMessage }) {
 
                                                 setSelectedMessageIndex(isOpen ? null : index);
                                             }}
-                                            className="text-gray-500 hover:text-gray-800 p-1"
+                                            className="opacity-70 hover:opacity-100 p-1"
                                         >
                                             <FaAngleDown size={16} />
                                         </button>
@@ -293,7 +293,7 @@ function ChatMessages({ setSendMessage }) {
                                     {selectedMessageIndex === index && (
                                         <div
                                             ref={menuRef}
-                                            className="fixed shadow rounded py-1 z-30 bg-gray-800 text-white"
+                                            className="fixed shadow-lg rounded-xl py-1 z-30 bg-surface text-ink border border-line"
                                             style={{
                                                 left: contextMenuCoords ? contextMenuCoords.x : 'auto',
                                                 top: contextMenuCoords ? contextMenuCoords.y : 'auto',
@@ -302,7 +302,7 @@ function ChatMessages({ setSendMessage }) {
                                         >
                                             <div className="flex flex-col">
                                                 <button
-                                                    className="px-3 py-1 text-left hover:bg-gray-700"
+                                                    className="px-4 py-1.5 text-left hover:bg-raised"
                                                     onClick={() => {
                                                         handleCopy(msg.message);
                                                         setSelectedMessageIndex(null);
@@ -311,8 +311,8 @@ function ChatMessages({ setSendMessage }) {
                                                 >
                                                     Copy
                                                 </button>
-                                                {/* <button className="px-3 py-1 text-left hover:bg-gray-700">Edit</button> */}
-                                                {/* <button className="px-3 py-1 text-left hover:bg-gray-700">Delete</button> */}
+                                                {/* <button className="px-4 py-1.5 text-left hover:bg-raised">Edit</button> */}
+                                                {/* <button className="px-4 py-1.5 text-left hover:bg-raised">Delete</button> */}
                                             </div>
                                         </div>
                                     )}
@@ -327,7 +327,7 @@ function ChatMessages({ setSendMessage }) {
                             <img
                                 src={user?.profileimg || "default-avatar-url"}
                                 alt="User"
-                                className="rounded-full w-10 h-10 ml-3 shadow-lg"
+                                className="hidden"
                             />
                         )}
                     </div>
@@ -335,7 +335,7 @@ function ChatMessages({ setSendMessage }) {
             </div>
 
 
-            <div className="p-2 flex items-center ml-1 mr-1  rounded-2xl shadow-lg ">
+            <div className="px-4 md:px-6 py-3 flex items-center gap-2 bg-surface border-t border-line">
                 <div className="flex-1 relative">
                     <textarea
                         value={newMessage}
@@ -347,7 +347,7 @@ function ChatMessages({ setSendMessage }) {
                             }
                         }}
                         placeholder="Type a message"
-                        className="w-full bg-gray-700 text-white p-3 pl-4 pr-4 rounded-full outline-none resize-none overflow-y-auto scrollbar-hide min-h-[45px] max-h-[120px] h-14"
+                        className="w-full bg-raised text-ink placeholder-muted p-3 pl-5 pr-4 rounded-full outline-none focus:ring-2 focus:ring-brand/40 resize-none overflow-y-auto scrollbar-hide min-h-[45px] max-h-[120px] h-14"
 
                         disabled={!chatUser}
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -368,32 +368,32 @@ function ChatMessages({ setSendMessage }) {
                         <section>
                             <div {...getRootProps()}>
                                 <input {...getInputProps()} name='file' disabled={!chatUser} type='file' accept="image/*,video/*" />
-                                <div className={`${chatUser ? 'cursor-styleer' : 'cursor-default'} m-4`}>
-                                    <LuUpload className="text-white" size={18} />
+                                <div className={`${chatUser ? 'cursor-pointer hover:bg-line' : 'cursor-default'} p-3 rounded-full bg-raised transition-colors`}>
+                                    <LuUpload className="text-muted" size={18} />
                                 </div>
                             </div>
                         </section>
                     )}
                 </Dropzone>
                 {uploadStatus === "uploading" && (
-                    <div className="text-gray-500 flex items-center mt-2">
+                    <div className="text-muted text-xs flex items-center ml-2">
                         <span className="loader mr-2"></span> Uploading...
                     </div>
                 )}
                 {uploadStatus === "uploaded" && (
-                    <div className="text-green-500 mt-2">File uploaded successfully!</div>
+                    <div className="text-success text-xs ml-2">File uploaded successfully!</div>
                 )}
                 {uploadStatus === "error" && (
-                    <div className="text-red-500 mt-2">Error uploading file. Please try again.</div>
+                    <div className="text-danger text-xs ml-2">Error uploading file. Please try again.</div>
                 )}
-                <button onClick={handleSend} className="bg-pink-500 p-3 rounded-full" disabled={!chatUser}>
+                <button onClick={handleSend} className="bg-brand hover:bg-brand-strong text-on-brand disabled:opacity-50 transition p-3 rounded-full" aria-label="Send message" disabled={!chatUser}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth="2"
                         stroke="currentColor"
-                        className="w-6 h-6 text-white"
+                        className="w-6 h-6"
                     >
                         <path
                             strokeLinecap="round"

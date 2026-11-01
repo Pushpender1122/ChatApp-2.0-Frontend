@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ChatUserContext } from '../context/chatUser';
+import { IoArrowBack } from 'react-icons/io5';
+import ThemeToggle from '../utility/ThemeToggle';
 
 const UserComponent = ({ user }) => {
     const [editMode, setEditMode] = useState(false);
@@ -92,108 +94,93 @@ const UserComponent = ({ user }) => {
         }
     };
 
+    const fieldClass = `w-full px-4 py-3 rounded-xl bg-surface text-ink border ${editMode ? 'border-brand ring-2 ring-brand/20' : 'border-line'} disabled:opacity-80 outline-none`;
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-dark-blue-900 text-white px-4 md:px-8">
-            <div className="w-full md:w-3/4 p-8 bg-black shadow-lg" style={{ 'height': '100vh', 'width': '100vw' }}>
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-light-blue-500">User Profile</h1>
-                    {!editMode && (
-                        <button
-                            onClick={() => setEditMode(true)}
-                            className="bg-light-blue-500 hover:bg-light-blue-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Edit Profile
-                        </button>
-                    )}
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={() => navigate(`/`)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Chat
-                        </button>
-                        <button
-                            onClick={handleLogout}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Logout
-                        </button>
-                    </div>
+        <div className="min-h-screen bg-app text-ink">
+            <header className="sticky top-0 z-10 flex items-center justify-between px-4 md:px-8 py-3 bg-surface border-b border-line">
+                <button
+                    onClick={() => navigate(`/`)}
+                    className="flex items-center gap-2 text-sm font-medium text-muted hover:text-ink"
+                >
+                    <IoArrowBack size={18} /> Back to chats
+                </button>
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                    <button
+                        onClick={handleLogout}
+                        className="bg-danger/10 hover:bg-danger/20 text-danger font-semibold py-2 px-4 rounded-full text-sm"
+                    >
+                        Log out
+                    </button>
                 </div>
-                <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-12">
-                    <div className="flex-none">
-                        <div className="relative w-32 h-32 md:w-48 md:h-48 mx-auto">
-                            <img
-                                src={profileImage || 'https://via.placeholder.com/150'}
-                                alt={userData?.username}
-                                className="rounded-full w-full h-full object-cover"
-                            />
-                            {editMode && (
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    className="absolute inset-0 opacity-0 cursor-pointer"
+            </header>
+            <main className="max-w-3xl mx-auto px-4 py-8 md:py-12">
+                <div className="bg-surface border border-line rounded-3xl overflow-hidden shadow-sm">
+                    <div className="h-28 bg-brand-soft" />
+                    <div className="px-6 md:px-10 pb-10">
+                        <div className="flex flex-wrap items-end justify-between gap-4 -mt-14">
+                            <div className="relative w-28 h-28">
+                                <img
+                                    src={profileImage || 'https://via.placeholder.com/150'}
+                                    alt={userData?.username}
+                                    className="rounded-full w-full h-full object-cover border-4 border-surface bg-raised"
                                 />
+                                {editMode && (
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                        aria-label="Change profile photo"
+                                    />
+                                )}
+                            </div>
+                            {!editMode && (
+                                <button
+                                    onClick={() => setEditMode(true)}
+                                    className="bg-brand hover:bg-brand-strong text-on-brand font-semibold py-2 px-5 rounded-full"
+                                >
+                                    Edit profile
+                                </button>
                             )}
                         </div>
-                    </div>
-                    <div className="flex-grow space-y-6">
-                        <div>
-                            <label className="block text-light-blue-500 font-semibold">Username</label>
-                            <input
-                                type="text"
-                                name="username"
-                                value={userData?.username}
-                                onChange={handleInputChange}
-                                disabled={!editMode}
-                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
-                                    }`}
-                            />
+                        <h1 className="text-2xl font-bold mt-4">{userData?.username}</h1>
+                        <p className="text-muted">{userData?.email}</p>
+
+                        <div className="mt-8 space-y-5">
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">Username</label>
+                                <input type="text" name="username" value={userData?.username || ''} onChange={handleInputChange} disabled={!editMode} className={fieldClass} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">Email</label>
+                                <input type="email" name="email" value={userData?.email || ''} onChange={handleInputChange} disabled={!editMode} className={fieldClass} />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1.5">About</label>
+                                <textarea name="description" value={userData?.description || ''} onChange={handleInputChange} disabled={!editMode} className={fieldClass} rows="5"></textarea>
+                            </div>
                         </div>
-                        <div>
-                            <label className="block text-light-blue-500 font-semibold">Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={userData?.email}
-                                onChange={handleInputChange}
-                                disabled={!editMode}
-                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
-                                    }`}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-light-blue-500 font-semibold">Description</label>
-                            <textarea
-                                name="description"
-                                value={userData?.description}
-                                onChange={handleInputChange}
-                                disabled={!editMode}
-                                className={`w-full p-3 rounded-lg bg-gray-800 text-white ${editMode ? 'border-2 border-light-blue-500' : 'border-none'
-                                    }`}
-                                rows="6"
-                            ></textarea>
-                        </div>
+
+                        {editMode && (
+                            <div className="mt-8 flex justify-end gap-3">
+                                <button
+                                    onClick={() => setEditMode(false)}
+                                    className="bg-raised hover:bg-line text-ink font-semibold py-2 px-5 rounded-full"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    className="bg-brand hover:bg-brand-strong text-on-brand font-semibold py-2 px-5 rounded-full"
+                                >
+                                    Save changes
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
-                {editMode && (
-                    <div className="mt-8 flex justify-end space-x-4">
-                        <button
-                            onClick={() => setEditMode(false)}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                            Save Changes
-                        </button>
-                    </div>
-                )}
-            </div>
+            </main>
             <ToastContainer />
         </div>
     );

@@ -132,28 +132,28 @@ function CallPage() {
     return (
         <div >
             {isInCall && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row" style={{ background: 'black' }}>
-                    {callType !== 'video' && (<div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                <div className="fixed inset-0 flex items-center justify-center z-50 flex-col md:flex-row bg-app text-ink" >
+                    {callType !== 'video' && (<div className="bg-surface text-ink border border-line p-8 rounded-3xl shadow-2xl text-center">
                         <h2 className="text-lg font-bold mb-4">In Call with {incomingCall?.senderName}</h2>
                         <img
                             src={incomingCall?.senderProfileImg}
                             alt="Caller"
-                            className="w-20 h-20 rounded-full mx-auto mb-2"
+                            className="w-24 h-24 object-cover ring-4 ring-brand/30 rounded-full mx-auto mb-3"
                         />
-                        <p className="text-sm text-gray-500 mb-4">
+                        <p className="text-sm text-muted mb-4">
                             {incomingCall?.senderName} is connected to the call.
                         </p>
 
                         <div className="mt-4 flex justify-center space-x-4">
                             <button
                                 onClick={handleMute}
-                                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                                className="bg-raised text-ink hover:opacity-90 font-semibold py-2.5 px-5 rounded-full"
                             >
                                 {isMuted ? 'Unmute' : 'Mute'}
                             </button>
                             <button
                                 onClick={handleEndCall}
-                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                className="bg-danger hover:opacity-90 text-white font-semibold py-2.5 px-5 rounded-full"
                             >
                                 End Call
                             </button>
@@ -175,21 +175,21 @@ function CallPage() {
                                 <div className="absolute bottom-0 mb-4 flex space-x-4">
                                     <button
                                         onClick={handleMute}
-                                        className={`${isMuted ? 'bg-gray-500' : 'bg-blue-500'}  text-white font-bold py-2 px-4 rounded`}
+                                        className={`${isMuted ? 'bg-raised text-ink' : 'bg-brand text-on-brand'}  font-semibold py-2.5 px-5 rounded-full`}
                                     >
                                         <FaMicrophone />
                                     </button>
 
                                     <button
                                         onClick={handleEndCall}
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                        className="bg-danger hover:opacity-90 text-white font-semibold py-2.5 px-5 rounded-full"
                                     >
                                         <FaPhoneSlash />
                                     </button>
 
                                     <button
                                         onClick={toggleVideoHide}
-                                        className={`${isVideoOn ? 'bg-blue-500' : 'bg-gray-500'} hover:bg-gray-700 text-white font-bold py-2 px-4 rounded`}
+                                        className={`${isVideoOn ? 'bg-brand text-on-brand' : 'bg-raised text-ink'} hover:opacity-90 font-semibold py-2.5 px-5 rounded-full`}
                                     >
                                         <FaVideoSlash />
                                     </button>
