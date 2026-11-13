@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ChatUserContext } from '../context/chatUser';
 import { IoArrowBack } from 'react-icons/io5';
 import ThemeToggle from '../utility/ThemeToggle';
+import Avatar from '../utility/Avatar';
 
 const UserComponent = ({ user }) => {
     const [editMode, setEditMode] = useState(false);
@@ -120,8 +121,8 @@ const UserComponent = ({ user }) => {
                     <div className="px-6 md:px-10 pb-10">
                         <div className="flex flex-wrap items-end justify-between gap-4 -mt-14">
                             <div className="relative w-28 h-28">
-                                <img
-                                    src={profileImage || 'https://via.placeholder.com/150'}
+                                <Avatar
+                                    src={profileImage}
                                     alt={userData?.username}
                                     className="rounded-full w-full h-full object-cover border-4 border-surface bg-raised"
                                 />

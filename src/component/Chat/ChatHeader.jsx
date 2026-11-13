@@ -9,6 +9,7 @@ import { useSocket } from '../context/socketContext';
 import { UserContext } from '../context/user';
 import SettingPopup from '../setting/pop.setting';
 import Modal from '../utility/zoomimage';
+import Avatar from '../utility/Avatar';
 function ChatHeader({ setIsMenuOpen }) {
     const { chatUser, setChatUser } = useContext(ChatUserContext);
     const socket = useSocket();
@@ -81,8 +82,8 @@ function ChatHeader({ setIsMenuOpen }) {
                 >
                     <IoArrowBack size={20} />
                 </button>
-                <img
-                    src={chatUser?.profileimg || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                <Avatar
+                    src={chatUser?.profileimg}
                     onClick={() => setImageZoomShowModal(true)}
                     alt="User"
                     className="rounded-full w-11 h-11 object-cover cursor-pointer shrink-0"

@@ -8,6 +8,7 @@ import Peer from 'peerjs';
 import UserFetch from '../userFetch';
 import axios from 'axios';
 import forge from 'node-forge';
+import Avatar from '../utility/Avatar';
 function Test() {
     const socket = useSocket();
     const { user } = useContext(UserContext);
@@ -17,7 +18,7 @@ function Test() {
     const [calluserid, setCallUserId] = useState(null);
     const [peerjsid, setPeerjsId] = useState(null);
     const [callType, setCallType] = useState(null);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(true);
     const [sendMessage, setSendMessage] = useState(false);
     const [loadingForKey, setLoadingForKey] = useState(true);
     const username = process.env.REACT_APP_METERED_USERNAME;
@@ -132,27 +133,31 @@ function Test() {
     return (
         <div className="h-[100dvh] bg-app text-ink">
             {!loadingForKey ? (
-                <div className="flex h-full">
-                    <div className="hidden md:flex">
-                        <NavRail />
-                    </div>
-                    <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex w-full md:w-auto flex-col h-full`}>
-                        <div className="flex-1 min-h-0">
+                <div className="flex flex-col h-full">
+                    <NavRail onShowChats={() => setIsMenuOpen(true)} />
+                    <main className="flex flex-col flex-1 min-h-0 w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-4 md:py-7">
+                        <div className="flex items-center justify-between mb-4 md:mb-6">
+                            <div>
+                                <h1 className="text-xl md:text-2xl font-bold">Messages</h1>
+                                <p className="text-xs md:text-sm text-muted mt-1">Home <span aria-hidden="true" className="mx-1">/</span> Chats</p>
+                            </div>
+                            <span className="hidden sm:inline-flex bg-brand-soft text-brand rounded-lg px-3 py-1.5 text-xs font-semibold">Your conversations</span>
+                        </div>
+                        <div className="flex flex-1 min-h-0 overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+                            <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex w-full md:w-auto flex-col h-full`}>
                             <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                            </div>
+                            <div className={`${!isMenuOpen ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 h-full`}>
+                                <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
+                            </div>
                         </div>
-                        <div className="md:hidden">
-                            <NavRail horizontal />
-                        </div>
-                    </div>
-                    <div className={`${!isMenuOpen ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 h-full`}>
-                        <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
-                    </div>
+                    </main>
                     <UserFetch />
                     {isCallPopupVisible && (
                         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm p-4">
                             <div className="bg-surface text-ink border border-line p-8 rounded-3xl shadow-2xl text-center w-full max-w-xs">
                                 <p className="text-sm text-muted mb-4">Incoming call</p>
-                                <img
+                                <Avatar
                                     src={incomingCall?.senderProfileImg}
                                     alt="Caller"
                                     className="w-24 h-24 rounded-full object-cover mx-auto mb-3 ring-4 ring-brand/30"

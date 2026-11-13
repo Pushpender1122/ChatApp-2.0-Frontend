@@ -1,35 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-    --app: 244 246 248;
+    --app: 240 245 249;
     --surface: 255 255 255;
-    --raised: 238 241 244;
-    --line: 226 230 235;
-    --ink: 15 23 42;
-    --muted: 100 116 139;
-    --brand: 13 148 136;
-    --brand-strong: 15 118 110;
-    --brand-soft: 204 244 238;
+    --raised: 246 249 252;
+    --line: 229 234 239;
+    --ink: 17 28 45;
+    --muted: 90 106 133;
+    --brand: 0 119 196;
+    --brand-strong: 0 100 166;
+    --brand-soft: 229 243 251;
     --on-brand: 255 255 255;
-    --danger: 225 29 72;
-    --success: 22 163 74;
+    --danger: 216 75 55;
+    --success: 19 135 81;
     color-scheme: light;
 }
 
 .dark {
-    --app: 9 13 17;
-    --surface: 17 24 30;
-    --raised: 27 37 46;
-    --line: 38 50 61;
-    --ink: 232 238 243;
-    --muted: 138 154 168;
-    --brand: 45 212 191;
-    --brand-strong: 94 234 212;
-    --brand-soft: 19 58 56;
-    --on-brand: 6 32 30;
+    --app: 21 38 58;
+    --surface: 17 28 45;
+    --raised: 29 45 65;
+    --line: 50 66 86;
+    --ink: 236 242 248;
+    --muted: 164 180 197;
+    --brand: 61 164 230;
+    --brand-strong: 32 137 205;
+    --brand-soft: 30 63 91;
+    --on-brand: 17 28 45;
     --danger: 251 113 133;
     --success: 74 222 128;
     color-scheme: dark;
@@ -45,14 +45,14 @@ html, body, #root {
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     background: rgb(var(--app));
     color: rgb(var(--ink));
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.2s, color 0.2s;
 }
 
-button:focus-visible, a:focus-visible {
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
     outline: 2px solid rgb(var(--brand));
     outline-offset: 2px;
 }
@@ -75,9 +75,7 @@ button:focus-visible, a:focus-visible {
 }
 
 .chat-bg {
-    background-color: rgb(var(--app));
-    background-image: radial-gradient(rgb(var(--line)) 1px, transparent 1px);
-    background-size: 22px 22px;
+    background-color: rgb(var(--surface));
 }
 
 .Toastify__toast { font-family: inherit; }

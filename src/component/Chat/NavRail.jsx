@@ -7,10 +7,9 @@ import { ChatUserContext } from '../context/chatUser';
 import ThemeToggle from '../utility/ThemeToggle';
 
 const linkClass = ({ isActive }) =>
-    `w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isActive ? 'bg-brand-soft text-brand' : 'text-muted hover:text-ink hover:bg-raised'}`;
+    `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${isActive ? 'bg-brand-soft text-brand' : 'text-muted hover:text-ink hover:bg-raised'}`;
 
-// Slim navigation: vertical rail on desktop, bottom bar on mobile
-function NavRail({ horizontal = false }) {
+function NavRail({ onShowChats }) {
     const navigate = useNavigate();
     const { setChatUser } = useContext(ChatUserContext);
 
@@ -34,25 +33,21 @@ function NavRail({ horizontal = false }) {
     };
 
     return (
-        <nav
-            className={horizontal
-                ? 'flex items-center justify-around px-4 py-2 bg-surface border-t border-line'
-                : 'flex flex-col items-center justify-between w-[72px] h-full py-5 bg-surface border-r border-line'}
-        >
-            <div className={horizontal ? 'contents' : 'flex flex-col items-center gap-2'}>
-                {!horizontal && (
-                    <span className="w-10 h-10 rounded-xl bg-brand text-on-brand flex items-center justify-center mb-4">
+        <nav aria-label="Main navigation" className="bg-surface border-b border-line">
+            <div className="max-w-[1440px] mx-auto flex items-center gap-3 px-4 md:px-8 h-16">
+                <NavLink to="/" onClick={onShowChats} className="flex items-center gap-2 mr-auto md:mr-8" aria-label="RealTalk home">
+                    <span className="w-9 h-9 rounded-lg bg-brand text-on-brand flex items-center justify-center">
                         <IoChatbubbleEllipses size={22} />
                     </span>
-                )}
-                <NavLink to="/" end className={linkClass} aria-label="Chats" title="Chats">
-                    <IoChatbubbleEllipses size={20} />
+                    <span className="text-lg font-bold tracking-tight text-ink">RealTalk</span>
+                </NavLink>
+                <NavLink to="/" end onClick={onShowChats} className={linkClass} aria-label="Chats" title="Chats">
+                    <IoChatbubbleEllipses size={18} /><span className="hidden sm:inline">Chats</span>
                 </NavLink>
                 <NavLink to={`${process.env.REACT_APP_BASE_URL}/profile`} className={linkClass} aria-label="Profile" title="Profile">
-                    <IoPerson size={20} />
+                    <IoPerson size={18} /><span className="hidden sm:inline">Profile</span>
                 </NavLink>
-            </div>
-            <div className={horizontal ? 'contents' : 'flex flex-col gap-2'}>
+                <div className="hidden md:block flex-1" />
                 <ThemeToggle />
                 <button
                     onClick={handleLogout}

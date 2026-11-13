@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import forge from 'node-forge';
+import Avatar from '../utility/Avatar';
 
 function Sidebar({ setIsMenuOpen, sendMessage }) {
     const [users, setUsers] = useState([]);
@@ -374,16 +375,15 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
         }
     }, [sendMessage]);
 
-    const avatarFallback = "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D";
     const iconBtn = "relative w-10 h-10 rounded-xl flex items-center justify-center text-muted hover:text-ink hover:bg-raised transition-colors";
     const modalBackdrop = "fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn z-50";
     const modalCard = "bg-surface text-ink border border-line rounded-3xl shadow-2xl w-full max-w-md p-6 animate-scaleIn";
     return (
         <>
-            <aside className="w-full md:w-80 lg:w-96 bg-surface text-ink flex flex-col h-full border-r border-line">
+            <aside className="w-full md:w-72 lg:w-80 bg-surface text-ink flex flex-col h-full md:border-r border-line">
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                    <h1 className="text-2xl font-bold">Chats</h1>
+                    <div><h2 className="text-lg font-bold">Conversations</h2><p className="text-xs text-muted mt-1">Stay connected with your friends</p></div>
                     <div className="flex items-center gap-1">
                         <button onClick={togglePopup} className={iconBtn} aria-label="Add friend" title="Add friend">
                             <IoPersonAdd size={19} />
@@ -408,12 +408,13 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                             placeholder="Search conversations"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-raised text-ink placeholder-muted pl-10 pr-4 py-2.5 rounded-xl outline-none focus:ring-2 focus:ring-brand/40"
+                            className="w-full bg-surface border border-line text-ink placeholder-muted pl-10 pr-4 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-brand/40"
                         />
                     </div>
                 </div>
 
                 {/* Conversation list */}
+                <div className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted">Recent chats</div>
                 <div className="flex-1 overflow-y-auto hide-scrollbar px-3 pb-3">
                     {filteredUsers.length > 0 ? (
                         <div className="space-y-1">
@@ -423,16 +424,17 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                                 const isOnline = allUserStatus.some((status) => status === u._id);
                                 const unread = messageNotification.find((m) => m.userId === u._id && m.status === true);
                                 return (
-                                    <div
+                                    <button
+                                        type="button"
                                         key={u._id}
-                                        className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-colors duration-200
+                                        className={`w-full text-left flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors duration-200
                                             ${isActiveChatUser ? 'bg-brand-soft' : 'hover:bg-raised'}
                                             ${isBeingAnimated ? 'animate-whatsapp-style-move' : ''}`}
                                         onClick={() => handleChangeUser(u._id, u.username, u.profileimg, u.email, u.description)}
                                     >
                                         <div className="relative shrink-0">
-                                            <img
-                                                src={u.profileimg || avatarFallback}
+                                            <Avatar
+                                                src={u.profileimg}
                                                 alt={u.username}
                                                 className={`rounded-full w-12 h-12 object-cover ${isBeingAnimated ? 'animate-brief-pulse' : ''}`}
                                             />
@@ -449,7 +451,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                                                 {unread.messageCount || 1}
                                             </span>
                                         )}
-                                    </div>
+                                    </button>
                                 );
                             })}
                         </div>
@@ -467,7 +469,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                     to={`${process.env.REACT_APP_BASE_URL}/profile`}
                     className="flex items-center gap-3 px-5 py-3 border-t border-line hover:bg-raised transition-colors"
                 >
-                    <img src={user?.profileimg || avatarFallback} alt="Profile" className="rounded-full w-10 h-10 object-cover" />
+                    <Avatar src={user?.profileimg} alt="Profile" className="rounded-full w-10 h-10 object-cover" />
                     <div className="min-w-0">
                         <p className="font-semibold truncate leading-tight">{user?.username}</p>
                         <span className="text-xs text-success">Active now</span>
@@ -492,7 +494,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                                         className="flex items-center mb-4 animate-slideInRight"
                                         style={{ animationDelay: `${index * 0.1}s` }}
                                     >
-                                        <img src={request.profileimg} alt={request.username} className="w-12 h-12 rounded-full object-cover mr-4" />
+                                        <Avatar src={request.profileimg} alt={request.username} className="w-12 h-12 rounded-full object-cover mr-4" />
                                         <div className="flex-1">
                                             <h3 className="font-semibold">{request.username}</h3>
                                         </div>
@@ -536,7 +538,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                                             style={{ animationDelay: `${index * 0.05}s` }}
                                             onClick={() => setSelectedUser(pubUser)}
                                         >
-                                            <img src={pubUser.profileimg} alt={pubUser.username} className="rounded-full w-10 h-10 object-cover mr-3" />
+                                            <Avatar src={pubUser.profileimg} alt={pubUser.username} className="rounded-full w-10 h-10 object-cover mr-3" />
                                             <span>{pubUser.username}</span>
                                         </li>
                                     ))}
@@ -545,7 +547,7 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                         ) : (
                             <div className="animate-fadeIn">
                                 <div className="flex items-center mb-6">
-                                    <img src={selectedUser.profileimg} alt={selectedUser.username} className="rounded-full w-16 h-16 object-cover mr-4" />
+                                    <Avatar src={selectedUser.profileimg} alt={selectedUser.username} className="rounded-full w-16 h-16 object-cover mr-4" />
                                     <h3 className="text-xl font-semibold">{selectedUser.username}</h3>
                                 </div>
                                 <div className="flex gap-3">

@@ -6,6 +6,7 @@ import axios from 'axios';
 import { LuUpload } from "react-icons/lu";
 import Dropzone from 'react-dropzone'
 import Modal from '../utility/zoomimage';
+import Avatar from '../utility/Avatar';
 import forge from 'node-forge';
 import { FaAngleDown } from "react-icons/fa6";
 function ChatMessages({ setSendMessage }) {
@@ -231,8 +232,8 @@ function ChatMessages({ setSendMessage }) {
                     >
                         {/* Display profile image if message is from another user */}
                         {msg?.fromUserId !== user?._id && (
-                            <img
-                                src={chatUser?.profileimg || "https://images.unsplash.com/photo-1724086572650-685ff295750e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxOXx8fGVufDB8fHx8fA%3D%3D"}
+                            <Avatar
+                                src={chatUser?.profileimg}
                                 alt="Sender"
                                 className="rounded-full w-8 h-8 object-cover mr-2"
                             />

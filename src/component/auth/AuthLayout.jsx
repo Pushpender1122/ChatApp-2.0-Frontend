@@ -18,17 +18,19 @@ export const Logo = ({ className = '' }) => (
 );
 
 export const AuthLayout = ({ title, subtitle, error, children, footer }) => (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-app">
-        <aside className="hidden lg:flex flex-col justify-between p-12 bg-brand-soft border-r border-line">
+    <div className="min-h-screen grid lg:grid-cols-[1.15fr_1fr] bg-app">
+        <aside className="hidden lg:flex flex-col justify-between p-12 bg-surface border-r border-line">
             <Logo />
-            <div>
-                <h2 className="text-4xl font-bold text-ink leading-tight max-w-md">
-                    Conversations that feel effortless.
+            <div className="max-w-lg">
+                <span className="inline-flex text-xs font-semibold uppercase tracking-wider text-brand bg-brand-soft px-3 py-1.5 rounded-lg mb-6">Welcome to RealTalk</span>
+                <h2 className="text-4xl font-bold text-ink leading-tight">
+                    Better conversations, all in one place.
                 </h2>
-                <ul className="mt-10 space-y-6 max-w-md">
+                <p className="text-muted mt-4 leading-relaxed">A simple space to stay in touch, share moments and connect with the people who matter.</p>
+                <ul className="mt-10 space-y-5">
                     {highlights.map(({ icon: Icon, title: t, text }) => (
                         <li key={t} className="flex gap-4">
-                            <span className="shrink-0 w-11 h-11 rounded-xl bg-surface text-brand flex items-center justify-center shadow-sm">
+                            <span className="shrink-0 w-11 h-11 rounded-lg bg-brand-soft text-brand flex items-center justify-center">
                                 <Icon size={20} />
                             </span>
                             <div>
@@ -42,11 +44,11 @@ export const AuthLayout = ({ title, subtitle, error, children, footer }) => (
             <p className="text-sm text-muted">© RealTalk</p>
         </aside>
 
-        <main className="relative flex items-center justify-center px-6 py-12">
+        <main className="relative flex items-center justify-center px-4 sm:px-6 py-16">
             <ThemeToggle className="absolute top-4 right-4" />
-            <div className="w-full max-w-sm">
+            <div className="w-full max-w-md bg-surface border border-line rounded-2xl shadow-sm p-6 sm:p-10">
                 <Logo className="lg:hidden mb-8" />
-                <h1 className="text-3xl font-bold text-ink">{title}</h1>
+                <h1 className="text-2xl font-bold text-ink">{title}</h1>
                 <p className="text-muted mt-2">{subtitle}</p>
                 {error && (
                     <div role="alert" className="mt-6 text-sm text-danger bg-danger/10 border border-danger/30 rounded-xl px-4 py-3">
