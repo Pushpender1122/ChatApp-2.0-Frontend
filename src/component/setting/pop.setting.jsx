@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { Button, Paper } from '@mui/material';
+import Avatar from '../utility/Avatar';
 const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, setUser, setImageZoomShowModal }) => {
     if (!user) return null;
     // const handleRemoveFriend = () => {
@@ -36,7 +38,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
     };
     return (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-surface text-ink border border-line rounded-3xl shadow-2xl p-6 max-w-md w-full">
+            <Paper variant="outlined" className="text-ink rounded-3xl shadow-2xl p-6 max-w-md w-full">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Contact info</h2>
                     <button
@@ -49,7 +51,7 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
 
                 <div className="flex items-start">
                     {/* User Image */}
-                    <img
+                    <Avatar
                         src={user.profileimg}
                         alt={user.username}
                         className="rounded-full w-24 h-24 object-cover mr-6 cursor-pointer"
@@ -65,14 +67,15 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
 
                 <div className="mt-4">
                     {/* Remove Friend Button */}
-                    <button
+                    <Button
                         onClick={handleRemoveFriend}
-                        className="bg-danger/10 hover:bg-danger/20 text-danger font-semibold py-2 px-5 rounded-full"
+                        color="error"
+                        variant="outlined"
                     >
                         Remove Friend
-                    </button>
+                    </Button>
                 </div>
-            </div>
+            </Paper>
         </div>
     );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { IoChatbubbleEllipses, IoLockClosed, IoImages, IoCall } from 'react-icons/io5';
+import { Alert, Paper, TextField } from '@mui/material';
 import ThemeToggle from '../utility/ThemeToggle';
 
 const highlights = [
@@ -46,32 +47,22 @@ export const AuthLayout = ({ title, subtitle, error, children, footer }) => (
 
         <main className="relative flex items-center justify-center px-4 sm:px-6 py-16">
             <ThemeToggle className="absolute top-4 right-4" />
-            <div className="w-full max-w-md bg-surface border border-line rounded-2xl shadow-sm p-6 sm:p-10">
+            <Paper variant="outlined" className="w-full max-w-md rounded-2xl p-6 sm:p-10">
                 <Logo className="lg:hidden mb-8" />
                 <h1 className="text-2xl font-bold text-ink">{title}</h1>
                 <p className="text-muted mt-2">{subtitle}</p>
                 {error && (
-                    <div role="alert" className="mt-6 text-sm text-danger bg-danger/10 border border-danger/30 rounded-xl px-4 py-3">
+                    <Alert severity="error" className="mt-6">
                         {error}
-                    </div>
+                    </Alert>
                 )}
                 {children}
                 <p className="text-sm text-muted mt-8">{footer}</p>
-            </div>
+            </Paper>
         </main>
     </div>
 );
 
 export const AuthField = ({ label, id, ...props }) => (
-    <div>
-        <label htmlFor={id} className="block text-sm font-medium text-ink mb-1.5">{label}</label>
-        <input
-            id={id}
-            {...props}
-            className="w-full px-4 py-3 rounded-xl bg-surface border border-line text-ink placeholder-muted focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30 disabled:opacity-60 transition"
-        />
-    </div>
+    <TextField fullWidth variant="outlined" label={label} id={id} {...props} />
 );
-
-export const primaryBtn = 'w-full bg-brand hover:bg-brand-strong text-on-brand font-semibold py-3 px-4 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed';
-export const secondaryBtn = 'w-full bg-surface hover:bg-raised border border-line text-ink font-medium py-3 px-4 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed';

@@ -7,6 +7,7 @@ import { ChatUserContext } from '../context/chatUser';
 import { IoArrowBack } from 'react-icons/io5';
 import ThemeToggle from '../utility/ThemeToggle';
 import Avatar from '../utility/Avatar';
+import Paper from '@mui/material/Paper';
 
 const UserComponent = ({ user }) => {
     const [editMode, setEditMode] = useState(false);
@@ -116,7 +117,7 @@ const UserComponent = ({ user }) => {
                 </div>
             </header>
             <main className="max-w-3xl mx-auto px-4 py-8 md:py-12">
-                <div className="bg-surface border border-line rounded-3xl overflow-hidden shadow-sm">
+                <Paper variant="outlined" className="rounded-3xl overflow-hidden shadow-sm">
                     <div className="h-28 bg-brand-soft" />
                     <div className="px-6 md:px-10 pb-10">
                         <div className="flex flex-wrap items-end justify-between gap-4 -mt-14">
@@ -180,7 +181,7 @@ const UserComponent = ({ user }) => {
                             </div>
                         )}
                     </div>
-                </div>
+                </Paper>
             </main>
             <ToastContainer />
         </div>

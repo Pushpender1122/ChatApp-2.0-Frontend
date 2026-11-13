@@ -4,7 +4,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/theme';
-import { AuthLayout, AuthField, primaryBtn } from './AuthLayout';
+import Button from '@mui/material/Button';
+import { AuthLayout, AuthField } from './AuthLayout';
 
 const Signup = () => {
     const { theme } = useTheme();
@@ -65,9 +66,9 @@ const Signup = () => {
                 <AuthField label="Username" id="username" type="text" autoComplete="username" placeholder="Your name" required value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} />
                 <AuthField label="Email" id="email" type="email" autoComplete="email" placeholder="you@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
                 <AuthField label="Password" id="password" type="password" autoComplete="new-password" placeholder="Create a password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
-                <button type="submit" className={primaryBtn} disabled={loading}>
+                <Button type="submit" variant="contained" fullWidth size="large" disabled={loading}>
                     {loading ? 'Creating account...' : 'Sign up'}
-                </button>
+                </Button>
             </form>
             <ToastContainer theme={theme} />
         </AuthLayout>

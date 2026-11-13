@@ -10,6 +10,7 @@ import { UserContext } from '../context/user';
 import SettingPopup from '../setting/pop.setting';
 import Modal from '../utility/zoomimage';
 import Avatar from '../utility/Avatar';
+import IconButton from '@mui/material/IconButton';
 function ChatHeader({ setIsMenuOpen }) {
     const { chatUser, setChatUser } = useContext(ChatUserContext);
     const socket = useSocket();
@@ -96,15 +97,15 @@ function ChatHeader({ setIsMenuOpen }) {
                 </div>
             </div>
             <div className="flex items-center gap-1">
-                <button className={circleBtn} aria-label="Voice call" title="Voice call" onClick={() => chatUser ? handleSetData('voice') : ""}>
+                <IconButton className={circleBtn} aria-label="Voice call" title="Voice call" onClick={() => chatUser ? handleSetData('voice') : ""}>
                     <IoMdCall size={20} />
-                </button>
-                <button className={circleBtn} aria-label="Video call" title="Video call" onClick={() => chatUser ? handleSetData('video') : ""}>
+                </IconButton>
+                <IconButton className={circleBtn} aria-label="Video call" title="Video call" onClick={() => chatUser ? handleSetData('video') : ""}>
                     <FaVideo size={18} />
-                </button>
-                <button className={circleBtn} aria-label="Contact info" title="Contact info" onClick={() => chatUser && setShowSettingPopup(true)}>
+                </IconButton>
+                <IconButton className={circleBtn} aria-label="Contact info" title="Contact info" onClick={() => chatUser && setShowSettingPopup(true)}>
                     <IoMdSettings size={20} />
-                </button>
+                </IconButton>
                 {showSettingPopup && (<SettingPopup currentUser={user} user={chatUser} onClose={() => setShowSettingPopup(false)} setChatUser={setChatUser} socket={socket} setUser={setUser} setImageZoomShowModal={setImageZoomShowModal} />)}
             </div>
         </header>

@@ -9,6 +9,7 @@ import UserFetch from '../userFetch';
 import axios from 'axios';
 import forge from 'node-forge';
 import Avatar from '../utility/Avatar';
+import Paper from '@mui/material/Paper';
 function Test() {
     const socket = useSocket();
     const { user } = useContext(UserContext);
@@ -143,14 +144,14 @@ function Test() {
                             </div>
                             <span className="hidden sm:inline-flex bg-brand-soft text-brand rounded-lg px-3 py-1.5 text-xs font-semibold">Your conversations</span>
                         </div>
-                        <div className="flex flex-1 min-h-0 overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+                        <Paper variant="outlined" className="flex flex-1 min-h-0 overflow-hidden rounded-xl">
                             <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex w-full md:w-auto flex-col h-full`}>
-                            <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
+                                <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
                             </div>
                             <div className={`${!isMenuOpen ? 'flex' : 'hidden'} md:flex flex-1 min-w-0 h-full`}>
                                 <ChatWindow setIsMenuOpen={setIsMenuOpen} setSendMessage={setSendMessage} />
                             </div>
-                        </div>
+                        </Paper>
                     </main>
                     <UserFetch />
                     {isCallPopupVisible && (

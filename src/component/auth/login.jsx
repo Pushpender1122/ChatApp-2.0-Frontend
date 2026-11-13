@@ -5,7 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/user';
 import { useTheme } from '../context/theme';
-import { AuthLayout, AuthField, primaryBtn, secondaryBtn } from './AuthLayout';
+import Button from '@mui/material/Button';
+import { AuthLayout, AuthField } from './AuthLayout';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -103,20 +104,22 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
                 />
-                <button type="submit" className={primaryBtn} disabled={loading}>
+                <Button type="submit" variant="contained" fullWidth size="large" disabled={loading}>
                     {loading && !templogin ? 'Logging in...' : 'Log in'}
-                </button>
+                </Button>
                 <div className="flex items-center gap-3 text-xs text-muted">
                     <span className="flex-1 h-px bg-line" />or<span className="flex-1 h-px bg-line" />
                 </div>
-                <button
+                <Button
                     type="submit"
-                    className={secondaryBtn}
+                    variant="outlined"
+                    fullWidth
+                    size="large"
                     disabled={loading}
                     onClick={() => setTemplogin(true)}
                 >
                     {loading && templogin ? 'Logging in...' : 'Continue as guest'}
-                </button>
+                </Button>
             </form>
             <ToastContainer theme={theme} />
         </AuthLayout>

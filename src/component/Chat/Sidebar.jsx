@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import forge from 'node-forge';
 import Avatar from '../utility/Avatar';
+import IconButton from '@mui/material/IconButton';
 
 function Sidebar({ setIsMenuOpen, sendMessage }) {
     const [users, setUsers] = useState([]);
@@ -385,17 +386,17 @@ function Sidebar({ setIsMenuOpen, sendMessage }) {
                 <div className="flex items-center justify-between px-5 pt-5 pb-3">
                     <div><h2 className="text-lg font-bold">Conversations</h2><p className="text-xs text-muted mt-1">Stay connected with your friends</p></div>
                     <div className="flex items-center gap-1">
-                        <button onClick={togglePopup} className={iconBtn} aria-label="Add friend" title="Add friend">
+                        <IconButton onClick={togglePopup} className={iconBtn} aria-label="Add friend" title="Add friend">
                             <IoPersonAdd size={19} />
-                        </button>
-                        <button onClick={togglePopupForFriends} className={iconBtn} aria-label="Friend requests" title="Friend requests">
+                        </IconButton>
+                        <IconButton onClick={togglePopupForFriends} className={iconBtn} aria-label="Friend requests" title="Friend requests">
                             <IoIosNotifications size={22} className={notificationCount > 0 ? "animate-pulse" : ""} />
                             {notificationCount > 0 && (
                                 <span className="absolute top-1 right-1 bg-danger text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">
                                     {notificationCount}
                                 </span>
                             )}
-                        </button>
+                        </IconButton>
                     </div>
                 </div>
 

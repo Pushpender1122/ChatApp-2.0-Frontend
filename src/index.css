@@ -4,15 +4,15 @@
 @tailwind utilities;
 
 :root {
-    --app: 240 245 249;
+    --app: 245 245 245;
     --surface: 255 255 255;
-    --raised: 246 249 252;
-    --line: 229 234 239;
-    --ink: 17 28 45;
-    --muted: 90 106 133;
-    --brand: 0 119 196;
-    --brand-strong: 0 100 166;
-    --brand-soft: 229 243 251;
+    --raised: 247 247 247;
+    --line: 229 229 229;
+    --ink: 23 23 23;
+    --muted: 100 100 100;
+    --brand: 23 23 23;
+    --brand-strong: 64 64 64;
+    --brand-soft: 235 235 235;
     --on-brand: 255 255 255;
     --danger: 216 75 55;
     --success: 19 135 81;
@@ -20,16 +20,16 @@
 }
 
 .dark {
-    --app: 21 38 58;
-    --surface: 17 28 45;
-    --raised: 29 45 65;
-    --line: 50 66 86;
-    --ink: 236 242 248;
-    --muted: 164 180 197;
-    --brand: 61 164 230;
-    --brand-strong: 32 137 205;
-    --brand-soft: 30 63 91;
-    --on-brand: 17 28 45;
+    --app: 10 10 10;
+    --surface: 23 23 23;
+    --raised: 38 38 38;
+    --line: 64 64 64;
+    --ink: 245 245 245;
+    --muted: 171 171 171;
+    --brand: 245 245 245;
+    --brand-strong: 212 212 212;
+    --brand-soft: 55 55 55;
+    --on-brand: 23 23 23;
     --danger: 251 113 133;
     --success: 74 222 128;
     color-scheme: dark;

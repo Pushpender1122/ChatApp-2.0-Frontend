@@ -3,6 +3,7 @@ import axios from 'axios';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { IoChatbubbleEllipses, IoPerson, IoLogOut } from 'react-icons/io5';
 import { toast } from 'react-toastify';
+import { AppBar, IconButton, Toolbar } from '@mui/material';
 import { ChatUserContext } from '../context/chatUser';
 import ThemeToggle from '../utility/ThemeToggle';
 
@@ -33,8 +34,8 @@ function NavRail({ onShowChats }) {
     };
 
     return (
-        <nav aria-label="Main navigation" className="bg-surface border-b border-line">
-            <div className="max-w-[1440px] mx-auto flex items-center gap-3 px-4 md:px-8 h-16">
+        <AppBar component="nav" position="static" color="transparent" elevation={0} aria-label="Main navigation" className="bg-surface border-b border-line">
+            <Toolbar disableGutters className="w-full max-w-[1440px] mx-auto flex items-center gap-3 px-4 md:px-8 h-16">
                 <NavLink to="/" onClick={onShowChats} className="flex items-center gap-2 mr-auto md:mr-8" aria-label="RealTalk home">
                     <span className="w-9 h-9 rounded-lg bg-brand text-on-brand flex items-center justify-center">
                         <IoChatbubbleEllipses size={22} />
@@ -49,16 +50,16 @@ function NavRail({ onShowChats }) {
                 </NavLink>
                 <div className="hidden md:block flex-1" />
                 <ThemeToggle />
-                <button
+                <IconButton
                     onClick={handleLogout}
                     aria-label="Log out"
                     title="Log out"
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-muted hover:text-danger hover:bg-raised transition-colors"
                 >
                     <IoLogOut size={22} />
-                </button>
-            </div>
-        </nav>
+                </IconButton>
+            </Toolbar>
+        </AppBar>
     );
 }
 
