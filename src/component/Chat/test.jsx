@@ -136,15 +136,8 @@ function Test() {
             {!loadingForKey ? (
                 <div className="flex flex-col h-full">
                     <NavRail onShowChats={() => setIsMenuOpen(true)} />
-                    <main className="flex flex-col flex-1 min-h-0 w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-4 md:py-7">
-                        <div className="flex items-center justify-between mb-4 md:mb-6">
-                            <div>
-                                <h1 className="text-xl md:text-2xl font-bold">Messages</h1>
-                                <p className="text-xs md:text-sm text-muted mt-1">Home <span aria-hidden="true" className="mx-1">/</span> Chats</p>
-                            </div>
-                            <span className="hidden sm:inline-flex bg-brand-soft text-brand rounded-lg px-3 py-1.5 text-xs font-semibold">Your conversations</span>
-                        </div>
-                        <Paper variant="outlined" className="flex flex-1 min-h-0 overflow-hidden rounded-xl">
+                    <main aria-label="Messages" className="flex flex-1 min-h-0 min-w-0 w-full">
+                        <Paper square elevation={0} className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
                             <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex w-full md:w-auto flex-col h-full`}>
                                 <Sidebar setIsMenuOpen={setIsMenuOpen} sendMessage={sendMessage} />
                             </div>
