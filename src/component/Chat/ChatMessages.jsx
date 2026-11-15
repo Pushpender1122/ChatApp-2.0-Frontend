@@ -150,10 +150,14 @@ function ChatMessages({ setSendMessage }) {
         }
     };
     function encryptMessage(message, key, iv) {
+        // Convert string (including emojis) to UTF-8 bytes
+        var utf8Bytes = forge.util.encodeUtf8(message);
+
         var cipher = forge.cipher.createCipher('AES-CBC', key);
         cipher.start({ iv: iv });
-        cipher.update(forge.util.createBuffer(message));
+        cipher.update(forge.util.createBuffer(utf8Bytes));
         cipher.finish();
+
         var encrypted = cipher.output;
         return encrypted.toHex();
     }
