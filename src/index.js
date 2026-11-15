@@ -6,9 +6,11 @@ import reportWebVitals from './reportWebVitals';
 import { UserProvider } from './component/context/user';
 import { SocketProvider } from './component/context/socketContext';
 import { ChatUserProvider } from './component/context/chatUser';
+import { ThemeProvider } from './component/context/theme';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
+  <ThemeProvider>
   <SocketProvider>
     <ChatUserProvider>
       <UserProvider>
@@ -16,6 +18,7 @@ root.render(
       </UserProvider>
     </ChatUserProvider>
   </SocketProvider>
+  </ThemeProvider>
   // </React.StrictMode>
 );
 

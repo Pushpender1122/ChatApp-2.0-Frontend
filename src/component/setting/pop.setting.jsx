@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { Button, Paper } from '@mui/material';
+import Avatar from '../utility/Avatar';
 const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, setUser, setImageZoomShowModal }) => {
     if (!user) return null;
     // const handleRemoveFriend = () => {
@@ -35,13 +37,13 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
         }
     };
     return (
-        <div className="fixed inset-1 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <Paper variant="outlined" className="text-ink rounded-3xl shadow-2xl p-6 max-w-md w-full">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">User Details</h2>
+                    <h2 className="text-xl font-bold">Contact info</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-800 text-lg"
+                        className="text-muted hover:text-ink text-2xl leading-none"
                     >
                         &times;
                     </button>
@@ -49,30 +51,31 @@ const UserDetailsPopup = ({ currentUser, user, onClose, setChatUser, socket, set
 
                 <div className="flex items-start">
                     {/* User Image */}
-                    <img
+                    <Avatar
                         src={user.profileimg}
                         alt={user.username}
-                        className="rounded-full w-24 h-24 mr-6 cursor-pointer"
+                        className="rounded-full w-24 h-24 object-cover mr-6 cursor-pointer"
                         onClick={() => setImageZoomShowModal(true)}
                     />
                     <div>
                         {/* User Details */}
-                        <h3 className="text-xl font-semibold text-gray-800">{user.username}</h3>
-                        <p className="text-gray-600">Email : {user.email}</p>
-                        <p className="text-gray-600">Bio : {user.description}</p>
+                        <h3 className="text-xl font-semibold">{user.username}</h3>
+                        <p className="text-muted">Email : {user.email}</p>
+                        <p className="text-muted">Bio : {user.description}</p>
                     </div>
                 </div>
 
                 <div className="mt-4">
                     {/* Remove Friend Button */}
-                    <button
+                    <Button
                         onClick={handleRemoveFriend}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        color="error"
+                        variant="outlined"
                     >
                         Remove Friend
-                    </button>
+                    </Button>
                 </div>
-            </div>
+            </Paper>
         </div>
     );
 };

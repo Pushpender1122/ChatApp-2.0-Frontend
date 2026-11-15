@@ -1,23 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --app: 245 245 245;
+    --surface: 255 255 255;
+    --raised: 247 247 247;
+    --line: 229 229 229;
+    --ink: 23 23 23;
+    --muted: 100 100 100;
+    --brand: 23 23 23;
+    --brand-strong: 64 64 64;
+    --brand-soft: 235 235 235;
+    --on-brand: 255 255 255;
+    --danger: 216 75 55;
+    --success: 19 135 81;
+    color-scheme: light;
+}
+
+.dark {
+    --app: 10 10 10;
+    --surface: 23 23 23;
+    --raised: 38 38 38;
+    --line: 64 64 64;
+    --ink: 245 245 245;
+    --muted: 171 171 171;
+    --brand: 245 245 245;
+    --brand-strong: 212 212 212;
+    --brand-soft: 55 55 55;
+    --on-brand: 23 23 23;
+    --danger: 251 113 133;
+    --success: 74 222 128;
+    color-scheme: dark;
+}
+
 * {
     margin: 0;
     padding: 0;
-
 }
 
-/* For WebKit browsers (Chrome, Safari, etc.) */
+html, body, #root {
+    height: 100%;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: rgb(var(--app));
+    color: rgb(var(--ink));
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
     width: 0;
     height: 0;
 }
 
-/* For Firefox */
 .hide-scrollbar {
     scrollbar-width: none;
-    /* hide scrollbar */
     -ms-overflow-style: none;
-    /* hide scrollbar in IE 10+ */
 }
+
+.auth-bg {
+    background:
+        radial-gradient(48rem 26rem at 0% 0%, rgb(var(--brand) / 0.16), transparent 60%),
+        radial-gradient(40rem 24rem at 100% 100%, rgb(var(--brand) / 0.10), transparent 60%),
+        rgb(var(--app));
+}
+
+.chat-bg {
+    background-color: rgb(var(--surface));
+}
+
+.Toastify__toast { font-family: inherit; }

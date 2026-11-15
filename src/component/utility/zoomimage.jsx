@@ -16,10 +16,10 @@ const Modal = ({ image, alt, onClose }) => {
     }, [onClose]);
 
     return (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 zoom-img-user " style={{ zIndex: '99999' }}>
-            <div className="max-w-lg w-full bg-white p-4 rounded-lg overflow-hidden">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black/70 backdrop-blur-sm zoom-img-user " style={{ zIndex: '99999' }}>
+            <div className="relative max-w-lg w-full bg-surface p-3 rounded-2xl overflow-hidden shadow-2xl">
                 <img src={image || "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"} alt={alt} className="w-full h-full object-cover" />
-                <button className="absolute top-0 right-0 p-2" onClick={(event) => { event.stopPropagation(); onClose(); }}>Close</button>
+                <button className="absolute top-3 right-3 px-3 py-1 text-sm font-medium rounded-full bg-surface/90 text-ink shadow" onClick={(event) => { event.stopPropagation(); onClose(); }}>Close</button>
             </div>
         </div>
     );
